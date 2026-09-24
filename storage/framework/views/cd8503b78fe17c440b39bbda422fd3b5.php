@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Analytics | Upskill</title>
-    {{-- Browser tab icon (favicon) --}}
-    <link rel="icon" type="image/png" href="{{ asset('images/PSU-Logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('images/PSU-Logo.png') }}">
+    
+    <link rel="icon" type="image/png" href="<?php echo e(asset('images/PSU-Logo.png')); ?>">
+    <link rel="apple-touch-icon" href="<?php echo e(asset('images/PSU-Logo.png')); ?>">
 <style>
     :root{
         --navy:#13176b;
@@ -118,48 +118,48 @@
 </head>
 <body>
 
-@include('components.authenticated-topbar')
+<?php echo $__env->make('components.authenticated-topbar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
 <div class="layout faculty-sidebar-layout">
 
-    {{-- Sidebar â€” Analytics is this page; everything else connected --}}
-    @include('components.faculty-sidebar')
+    
+    <?php echo $__env->make('components.faculty-sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-    {{-- Main content --}}
+    
     <main class="main">
 
         <div class="page-head" style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
             <div>
                 <h2>Analytics</h2>
-                <p class="live-line">Last hour - <span class="count">{{ $onlineNow ?? 0 }}</span> learners online</p>
+                <p class="live-line">Last hour - <span class="count"><?php echo e($onlineNow ?? 0); ?></span> learners online</p>
             </div>
-            <a href="{{ route('faculty.analytics.report') }}" class="download-report-btn" title="Download the full analytics report as a PDF">
+            <a href="<?php echo e(route('faculty.analytics.report')); ?>" class="download-report-btn" title="Download the full analytics report as a PDF">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg>
                 Download Report
             </a>
         </div>
 
-        {{-- â•â•â•â•â•â•â•â•â•â•â•â•â•â• GRADIENT STAT CARDS â•â•â•â•â•â•â•â•â•â•â•â•â•â• --}}
+        
         <section class="stat-cards">
             <div class="g-card navy">
                 <span class="watermark">
                     <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="8" r="4"/><path d="M1 21c0-4 3.5-7 8-7s8 3 8 7"/><circle cx="17" cy="9" r="3"/><path d="M17 14c3.3 0 6 2.2 6 5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
                 </span>
-                <span class="num" id="faculty-live-active-users">{{ $onlineNow ?? 0 }}</span>
+                <span class="num" id="faculty-live-active-users"><?php echo e($onlineNow ?? 0); ?></span>
                 <span class="label">Live Learners</span>
             </div>
             <div class="g-card gold">
                 <span class="watermark">
                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 15a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/><path d="M8.2 13.9 7 23l5-3 5 3-1.2-9.1"/></svg>
                 </span>
-                <span class="num">{{ $stats['certificates'] ?? 0 }}</span>
+                <span class="num"><?php echo e($stats['certificates'] ?? 0); ?></span>
                 <span class="label">Learners with Certificates</span>
             </div>
             <div class="g-card cyan">
                 <span class="watermark">
                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                 </span>
-                <span class="num">{{ $stats['lessons_done'] ?? 0 }}</span>
+                <span class="num"><?php echo e($stats['lessons_done'] ?? 0); ?></span>
                 <span class="label">Lessons Completed</span>
             </div>
         </section>
@@ -174,18 +174,18 @@
             </div>
         </section>
 
-        {{-- â•â•â•â•â•â•â•â•â•â•â•â•â•â• CHARTS â•â•â•â•â•â•â•â•â•â•â•â•â•â• --}}
+        
         <div class="charts-grid">
 
-            {{-- Total Academy Statistics â€” SVG area chart --}}
+            
             <section class="panel">
                 <div class="panel-head">
                     <span>Total Academy Statistics</span>
-                    {{-- âš  Not connected â€” timeline filter does nothing yet --}}
+                    
                     <span class="range">Graph timeline: All time â–¾</span>
                 </div>
                 <div class="panel-body">
-                    @php
+                    <?php
                         $points = collect($academyStats ?? []);
                         // Chart geometry
                         $W = 720;  $H = 260;
@@ -207,62 +207,62 @@
                         $lineStr = $coords->map(fn ($c) => round($c['x'], 1).','.round($c['y'], 1))->implode(' ');
                         $areaStr = $lineStr.' '.round($padL + $plotW, 1).','.($padT + $plotH).' '.$padL.','.($padT + $plotH);
                         $peak = $coords->sortByDesc('value')->first();
-                    @endphp
+                    ?>
 
-                    @if($points->isNotEmpty())
+                    <?php if($points->isNotEmpty()): ?>
                         <div class="area-chart-wrap">
-                        <svg viewBox="0 0 {{ $W }} {{ $H }}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Total academy statistics over time">
-                            {{-- horizontal gridlines + y labels --}}
-                            @for($v = 0; $v <= $maxV; $v += 10)
-                                @php $gy = $padT + $plotH - ($plotH * $v / $maxV); @endphp
-                                <line x1="{{ $padL }}" y1="{{ $gy }}" x2="{{ $padL + $plotW }}" y2="{{ $gy }}" stroke="#e5e7eb" stroke-width="1"/>
-                                <text x="{{ $padL - 10 }}" y="{{ $gy + 4 }}" text-anchor="end" font-size="11" font-weight="700" fill="#6b7280">{{ $v }}</text>
-                            @endfor
+                        <svg viewBox="0 0 <?php echo e($W); ?> <?php echo e($H); ?>" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Total academy statistics over time">
+                            
+                            <?php for($v = 0; $v <= $maxV; $v += 10): ?>
+                                <?php $gy = $padT + $plotH - ($plotH * $v / $maxV); ?>
+                                <line x1="<?php echo e($padL); ?>" y1="<?php echo e($gy); ?>" x2="<?php echo e($padL + $plotW); ?>" y2="<?php echo e($gy); ?>" stroke="#e5e7eb" stroke-width="1"/>
+                                <text x="<?php echo e($padL - 10); ?>" y="<?php echo e($gy + 4); ?>" text-anchor="end" font-size="11" font-weight="700" fill="#6b7280"><?php echo e($v); ?></text>
+                            <?php endfor; ?>
 
-                            {{-- filled area --}}
-                            <polygon points="{{ $areaStr }}" fill="#13176b" opacity="0.12"/>
-                            {{-- line --}}
-                            <polyline points="{{ $lineStr }}" fill="none" stroke="#13176b" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+                            
+                            <polygon points="<?php echo e($areaStr); ?>" fill="#13176b" opacity="0.12"/>
+                            
+                            <polyline points="<?php echo e($lineStr); ?>" fill="none" stroke="#13176b" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
 
-                            {{-- dots + x labels --}}
-                            @foreach($coords as $c)
-                                <circle cx="{{ round($c['x'],1) }}" cy="{{ round($c['y'],1) }}" r="3.5" fill="#fff" stroke="#13176b" stroke-width="2"/>
-                                <text x="{{ round($c['x'],1) }}" y="{{ $padT + $plotH + 18 }}" text-anchor="middle" font-size="10" font-weight="700" fill="#6b7280">
-                                    @foreach(explode("\n", $c['label']) as $li => $lineTxt)
-                                        <tspan x="{{ round($c['x'],1) }}" dy="{{ $li === 0 ? 0 : 12 }}">{{ $lineTxt }}</tspan>
-                                    @endforeach
+                            
+                            <?php $__currentLoopData = $coords; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $c): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <circle cx="<?php echo e(round($c['x'],1)); ?>" cy="<?php echo e(round($c['y'],1)); ?>" r="3.5" fill="#fff" stroke="#13176b" stroke-width="2"/>
+                                <text x="<?php echo e(round($c['x'],1)); ?>" y="<?php echo e($padT + $plotH + 18); ?>" text-anchor="middle" font-size="10" font-weight="700" fill="#6b7280">
+                                    <?php $__currentLoopData = explode("\n", $c['label']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $li => $lineTxt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <tspan x="<?php echo e(round($c['x'],1)); ?>" dy="<?php echo e($li === 0 ? 0 : 12); ?>"><?php echo e($lineTxt); ?></tspan>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </text>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-                            {{-- gold highlight + callout on the peak point --}}
-                            @if($peak)
-                                <circle cx="{{ round($peak['x'],1) }}" cy="{{ round($peak['y'],1) }}" r="5" fill="#dba617" stroke="#fff" stroke-width="2"/>
-                                @php
+                            
+                            <?php if($peak): ?>
+                                <circle cx="<?php echo e(round($peak['x'],1)); ?>" cy="<?php echo e(round($peak['y'],1)); ?>" r="5" fill="#dba617" stroke="#fff" stroke-width="2"/>
+                                <?php
                                     $bxW = 120; $bxH = 40;
                                     $bx = min(max($peak['x'] - $bxW - 14, $padL), $padL + $plotW - $bxW);
                                     $by = max($peak['y'] - $bxH - 6, 4);
-                                @endphp
-                                <rect x="{{ round($bx,1) }}" y="{{ round($by,1) }}" width="{{ $bxW }}" height="{{ $bxH }}" rx="8" fill="#fff" stroke="#e5e7eb"/>
-                                <text x="{{ round($bx + 12,1) }}" y="{{ round($by + 17,1) }}" font-size="11" font-weight="800" fill="#13176b">{{ str_replace("\n", ' ', $peak['label']) }}</text>
-                                <text x="{{ round($bx + 12,1) }}" y="{{ round($by + 32,1) }}" font-size="11" font-weight="700" fill="#6b7280">Amount: {{ $peak['value'] }}</text>
-                            @endif
+                                ?>
+                                <rect x="<?php echo e(round($bx,1)); ?>" y="<?php echo e(round($by,1)); ?>" width="<?php echo e($bxW); ?>" height="<?php echo e($bxH); ?>" rx="8" fill="#fff" stroke="#e5e7eb"/>
+                                <text x="<?php echo e(round($bx + 12,1)); ?>" y="<?php echo e(round($by + 17,1)); ?>" font-size="11" font-weight="800" fill="#13176b"><?php echo e(str_replace("\n", ' ', $peak['label'])); ?></text>
+                                <text x="<?php echo e(round($bx + 12,1)); ?>" y="<?php echo e(round($by + 32,1)); ?>" font-size="11" font-weight="700" fill="#6b7280">Amount: <?php echo e($peak['value']); ?></text>
+                            <?php endif; ?>
                         </svg>
                         </div>
-                    @else
+                    <?php else: ?>
                         <div class="empty-state">No statistics yet.</div>
-                    @endif
+                    <?php endif; ?>
                 </div>
             </section>
 
-            {{-- Learner Success â€” SVG donut chart --}}
+            
             <section class="panel">
                 <div class="panel-head">
                     <span>Learner Success</span>
-                    {{-- âš  Not connected â€” timeline filter does nothing yet --}}
+                    
                     <span class="range">All time â–¾</span>
                 </div>
                 <div class="panel-body">
-                    @php
+                    <?php
                         $success = collect($learnerSuccess ?? []);
                         $total   = max($success->sum('count'), 1);
                         $donutColors = ['#13176b', '#dba617', '#7fe9e3'];
@@ -281,39 +281,39 @@
                             $offset += $len;
                             return $s;
                         });
-                    @endphp
+                    ?>
 
-                    @if($success->isNotEmpty())
+                    <?php if($success->isNotEmpty()): ?>
                         <div class="donut-flex">
                             <div class="donut-wrap">
                                 <svg width="190" height="190" viewBox="0 0 190 190" role="img" aria-label="Learner success breakdown">
                                     <g transform="rotate(-90 95 95)">
-                                        @foreach($segments as $seg)
-                                            <circle cx="95" cy="95" r="{{ $R }}" fill="none"
-                                                stroke="{{ $seg['color'] }}" stroke-width="34"
-                                                stroke-dasharray="{{ round($seg['dash'],2) }} {{ round($seg['gap'],2) }}"
-                                                stroke-dashoffset="{{ round($seg['offset'],2) }}"/>
-                                        @endforeach
+                                        <?php $__currentLoopData = $segments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $seg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <circle cx="95" cy="95" r="<?php echo e($R); ?>" fill="none"
+                                                stroke="<?php echo e($seg['color']); ?>" stroke-width="34"
+                                                stroke-dasharray="<?php echo e(round($seg['dash'],2)); ?> <?php echo e(round($seg['gap'],2)); ?>"
+                                                stroke-dashoffset="<?php echo e(round($seg['offset'],2)); ?>"/>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </g>
-                                    <text x="95" y="90" text-anchor="middle" font-size="26" font-weight="800" fill="#13176b">{{ $success->sum('count') }}</text>
+                                    <text x="95" y="90" text-anchor="middle" font-size="26" font-weight="800" fill="#13176b"><?php echo e($success->sum('count')); ?></text>
                                     <text x="95" y="110" text-anchor="middle" font-size="11" font-weight="700" fill="#6b7280">Learners</text>
                                 </svg>
                             </div>
                             <div class="legend-box">
-                                @foreach($segments as $seg)
+                                <?php $__currentLoopData = $segments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $seg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <div class="legend-item">
-                                        <span class="legend-dot" style="background: {{ $seg['color'] }};"></span>
+                                        <span class="legend-dot" style="background: <?php echo e($seg['color']); ?>;"></span>
                                         <span>
-                                            <span class="l-num">{{ $seg['count'] }}</span><br>
-                                            <span class="l-text">{{ $seg['label'] }}</span>
+                                            <span class="l-num"><?php echo e($seg['count']); ?></span><br>
+                                            <span class="l-text"><?php echo e($seg['label']); ?></span>
                                         </span>
                                     </div>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
                         </div>
-                    @else
+                    <?php else: ?>
                         <div class="empty-state">No learner data yet.</div>
-                    @endif
+                    <?php endif; ?>
                 </div>
             </section>
 
@@ -324,7 +324,7 @@
 
 <script>
     function refreshFacultyMonitoring() {
-        fetch('{{ route('monitoring.live') }}')
+        fetch('<?php echo e(route('monitoring.live')); ?>')
             .then(response => response.json())
             .then(data => {
                 const active = document.getElementById('faculty-live-active-users');
@@ -358,7 +358,7 @@
     setInterval(refreshFacultyMonitoring, 15000);
 </script>
 
-{{-- â”€â”€ Back to top (appears on long pages) â”€â”€ --}}
+
 <button id="back-to-top-btn" type="button" title="Back to top" aria-label="Back to top"
         onclick="window.scrollTo({top:0,behavior:'smooth'});">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
@@ -380,9 +380,10 @@
     })();
 </script>
 
-    {{-- Shared responsiveness layer (drawer nav + grid stacking) --}}
-    @include('components.responsive')
+    
+    <?php echo $__env->make('components.responsive', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
 </html>
 
 
+<?php /**PATH C:\Users\Beerus\Herd\UpSkill-Microcredential_Platform\resources\views/faculty/analytics.blade.php ENDPATH**/ ?>
