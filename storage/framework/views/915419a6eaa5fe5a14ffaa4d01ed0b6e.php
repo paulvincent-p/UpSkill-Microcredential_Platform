@@ -1,14 +1,14 @@
-{{-- resources/views/admin/User_Detail.blade.php --}}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{{ $u->name }} | User Details</title>
+    <title><?php echo e($u->name); ?> | User Details</title>
 
-    <link rel="icon" type="image/png" href="{{ asset('images/PSU-Logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('images/PSU-Logo.png') }}">
+    <link rel="icon" type="image/png" href="<?php echo e(asset('images/PSU-Logo.png')); ?>">
+    <link rel="apple-touch-icon" href="<?php echo e(asset('images/PSU-Logo.png')); ?>">
 
     <style>
         :root {
@@ -255,35 +255,36 @@
 </head>
 
 <body>
-    @include('components.authenticated-topbar', ['user' => auth()->user()])
+    <?php echo $__env->make('components.authenticated-topbar', ['user' => auth()->user()], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
     <div class="layout admin-layout">
 
-        {{-- SHARED ADMIN SIDEBAR --}}
-        @include('components.admin-sidebar')
+        
+        <?php echo $__env->make('components.admin-sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-        {{-- MAIN CONTENT --}}
+        
         <main class="main user-detail-wrap">
             <div class="detail-column">
 
-                <a class="back-link" href="{{ route('admin.usermanagement') }}">
+                <a class="back-link" href="<?php echo e(route('admin.usermanagement')); ?>">
                     <span aria-hidden="true">&larr;</span> Back to User Management
                 </a>
 
-                {{-- Profile summary --}}
+                
                 <section class="card">
                     <div class="profile-top">
-                        <div class="avatar" @if($u->avatar_url) style="background-image:url('{{ $u->avatar_url }}')" @endif>
-                            @unless($u->avatar_url)
+                        <div class="avatar" <?php if($u->avatar_url): ?> style="background-image:url('<?php echo e($u->avatar_url); ?>')" <?php endif; ?>>
+                            <?php if (! ($u->avatar_url)): ?>
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></svg>
-                            @endunless
+                            <?php endif; ?>
                         </div>
 
                         <div class="profile-main">
-                            <h1>{{ $u->name }}</h1>
-                            <div class="profile-role">{{ $u->role }}</div>
-                            <span class="status-pill {{ $u->is_active ? 'status-on' : 'status-off' }}">
-                                {{ $u->is_active ? 'Active' : 'Inactive' }}
+                            <h1><?php echo e($u->name); ?></h1>
+                            <div class="profile-role"><?php echo e($u->role); ?></div>
+                            <span class="status-pill <?php echo e($u->is_active ? 'status-on' : 'status-off'); ?>">
+                                <?php echo e($u->is_active ? 'Active' : 'Inactive'); ?>
+
                             </span>
                         </div>
                     </div>
@@ -291,16 +292,16 @@
                     <div class="profile-meta">
                         <div class="meta-row">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
-                            <span>{{ $u->email }}</span>
+                            <span><?php echo e($u->email); ?></span>
                         </div>
                         <div class="meta-row">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6 16c.6-1.4 1.7-2 3-2s2.4.6 3 2M15 10h3M15 13h3"/></svg>
-                            <span>{{ $u->student_id ?? '—' }}</span>
+                            <span><?php echo e($u->student_id ?? '—'); ?></span>
                         </div>
                     </div>
                 </section>
 
-                {{-- Personal Information --}}
+                
                 <section class="card">
                     <h2 class="section-title">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></svg>
@@ -310,32 +311,32 @@
                     <div class="field-grid">
                         <div class="field">
                             <span class="label">Username</span>
-                            <div class="value {{ empty($u->username) ? 'empty' : '' }}">{{ $u->username ?? '—' }}</div>
+                            <div class="value <?php echo e(empty($u->username) ? 'empty' : ''); ?>"><?php echo e($u->username ?? '—'); ?></div>
                         </div>
 
                         <div class="field">
                             <span class="label">Phone Number</span>
-                            <div class="value {{ empty($u->phone) ? 'empty' : '' }}">{{ $u->phone ?? '—' }}</div>
+                            <div class="value <?php echo e(empty($u->phone) ? 'empty' : ''); ?>"><?php echo e($u->phone ?? '—'); ?></div>
                         </div>
 
                         <div class="field">
                             <span class="label">Gender</span>
-                            <div class="value {{ empty($u->gender) ? 'empty' : '' }}">{{ $u->gender ?? '—' }}</div>
+                            <div class="value <?php echo e(empty($u->gender) ? 'empty' : ''); ?>"><?php echo e($u->gender ?? '—'); ?></div>
                         </div>
 
                         <div class="field">
                             <span class="label">Date of Birth</span>
-                            <div class="value {{ empty($u->date_of_birth) ? 'empty' : '' }}">{{ $u->date_of_birth ? \Illuminate\Support\Carbon::parse($u->date_of_birth)->format('M d, Y') : '—' }}</div>
+                            <div class="value <?php echo e(empty($u->date_of_birth) ? 'empty' : ''); ?>"><?php echo e($u->date_of_birth ? \Illuminate\Support\Carbon::parse($u->date_of_birth)->format('M d, Y') : '—'); ?></div>
                         </div>
 
                         <div class="field">
                             <span class="label">Date Joined</span>
-                            <div class="value {{ empty($u->joined) ? 'empty' : '' }}">{{ $u->joined ?? '—' }}</div>
+                            <div class="value <?php echo e(empty($u->joined) ? 'empty' : ''); ?>"><?php echo e($u->joined ?? '—'); ?></div>
                         </div>
                     </div>
                 </section>
 
-                {{-- Education Information --}}
+                
                 <section class="card">
                     <h2 class="section-title">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m2 9 10-5 10 5-10 5z"/><path d="M6 11.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5"/></svg>
@@ -345,22 +346,22 @@
                     <div class="field-stack">
                         <div class="field">
                             <span class="label">School / Institution</span>
-                            <div class="value {{ empty($u->school) ? 'empty' : '' }}">{{ $u->school ?? '—' }}</div>
+                            <div class="value <?php echo e(empty($u->school) ? 'empty' : ''); ?>"><?php echo e($u->school ?? '—'); ?></div>
                         </div>
 
                         <div class="field">
                             <span class="label">Program / Education</span>
-                            <div class="value {{ empty($u->education) ? 'empty' : '' }}">{{ $u->education ?? '—' }}</div>
+                            <div class="value <?php echo e(empty($u->education) ? 'empty' : ''); ?>"><?php echo e($u->education ?? '—'); ?></div>
                         </div>
 
                         <div class="field">
                             <span class="label">Location</span>
-                            <div class="value {{ empty($u->location) ? 'empty' : '' }}">{{ $u->location ?? '—' }}</div>
+                            <div class="value <?php echo e(empty($u->location) ? 'empty' : ''); ?>"><?php echo e($u->location ?? '—'); ?></div>
                         </div>
                     </div>
                 </section>
 
-                {{-- Courses --}}
+                
                 <section class="card">
                     <h2 class="section-title">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 5h6a4 4 0 0 1 4 4v11a3 3 0 0 0-3-3H2z"/><path d="M22 5h-6a4 4 0 0 0-4 4v11a3 3 0 0 1 3-3h7z"/></svg>
@@ -368,21 +369,21 @@
                     </h2>
 
                     <div class="stat-list">
-                        @if($u->role === 'Faculty')
+                        <?php if($u->role === 'Faculty'): ?>
                             <div class="stat-row">
                                 <span>Courses Created</span>
-                                <strong>{{ $u->courses_created }}</strong>
+                                <strong><?php echo e($u->courses_created); ?></strong>
                             </div>
-                        @else
+                        <?php else: ?>
                             <div class="stat-row">
                                 <span>Courses Enrolled</span>
-                                <strong>{{ $u->enrollments }}</strong>
+                                <strong><?php echo e($u->enrollments); ?></strong>
                             </div>
-                        @endif
+                        <?php endif; ?>
                     </div>
                 </section>
 
-                {{-- Additional Information --}}
+                
                 <section class="card">
                     <h2 class="section-title">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
@@ -390,38 +391,38 @@
                     </h2>
 
                     <div class="field-stack">
-                        @if($u->bio)
+                        <?php if($u->bio): ?>
                             <div class="field">
                                 <span class="label">Bio</span>
-                                <div class="value prose">{{ $u->bio }}</div>
+                                <div class="value prose"><?php echo e($u->bio); ?></div>
                             </div>
-                        @endif
+                        <?php endif; ?>
 
-                        @if(!empty($u->skills_have))
+                        <?php if(!empty($u->skills_have)): ?>
                             <div class="field">
                                 <span class="label">Skills They Have</span>
                                 <div class="chips">
-                                    @foreach($u->skills_have as $s)
-                                        <span class="chip">{{ $s }}</span>
-                                    @endforeach
+                                    <?php $__currentLoopData = $u->skills_have; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $s): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <span class="chip"><?php echo e($s); ?></span>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </div>
                             </div>
-                        @endif
+                        <?php endif; ?>
 
-                        @if(!empty($u->skills_want))
+                        <?php if(!empty($u->skills_want)): ?>
                             <div class="field">
                                 <span class="label">Skills They Want to Learn</span>
                                 <div class="chips">
-                                    @foreach($u->skills_want as $s)
-                                        <span class="chip want">{{ $s }}</span>
-                                    @endforeach
+                                    <?php $__currentLoopData = $u->skills_want; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $s): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <span class="chip want"><?php echo e($s); ?></span>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </div>
                             </div>
-                        @endif
+                        <?php endif; ?>
 
-                        @if(!$u->bio && empty($u->skills_have) && empty($u->skills_want))
+                        <?php if(!$u->bio && empty($u->skills_have) && empty($u->skills_want)): ?>
                             <div class="empty-note">No additional information provided.</div>
-                        @endif
+                        <?php endif; ?>
                     </div>
                 </section>
 
@@ -429,6 +430,6 @@
         </main>
     </div>
 
-    @include('components.responsive')
+    <?php echo $__env->make('components.responsive', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
-</html>
+</html><?php /**PATH C:\Users\PaulV\Documents\MICROCREDENTIALS NEW ADDITIONS\UPSKILL - Microcredential Platform\resources\views/admin/users/show.blade.php ENDPATH**/ ?>

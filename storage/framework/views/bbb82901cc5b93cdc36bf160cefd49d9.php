@@ -1,30 +1,13 @@
-{{--
-    resources/views/admin/Profile.blade.php
 
-    Admin > My Profile.
-
-    Rebuilt to use the SAME design language as Faculty_Profile: identity
-    card, panel sections, and a slide-in Edit Profile drawer with tabbed
-    sections. The stylesheet below is the faculty one, so the two pages
-    stay visually identical.
-
-    Differences from the faculty page, all content rather than design:
-      - name is edited as first / middle / last / suffix, because
-        AdminController::updateProfile validates the parts separately
-      - Account Settings holds USERNAME as well as email and password
-      - no courses table or performance charts
-
-    Expects: $user (UserPresenter::admin)
---}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Profile | Upskill</title>
-    {{-- Browser tab icon (favicon) --}}
-    <link rel="icon" type="image/png" href="{{ asset('images/PSU-Logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('images/PSU-Logo.png') }}">
+    
+    <link rel="icon" type="image/png" href="<?php echo e(asset('images/PSU-Logo.png')); ?>">
+    <link rel="apple-touch-icon" href="<?php echo e(asset('images/PSU-Logo.png')); ?>">
 <style>
 
     :root{
@@ -424,19 +407,20 @@
 </head>
 <body>
 
-{{-- ===== SUCCESS TOAST ===== --}}
-@if (session('success'))
+
+<?php if(session('success')): ?>
 <div class="toast" id="successToast">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-    {{ session('success') }}
+    <?php echo e(session('success')); ?>
+
     <button class="toast-close" onclick="document.getElementById('successToast').classList.remove('show')">&times;</button>
 </div>
-@endif
-@include('components.authenticated-topbar', ['user' => auth()->user()])
+<?php endif; ?>
+<?php echo $__env->make('components.authenticated-topbar', ['user' => auth()->user()], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 <div class="layout">
 
-    {{-- Admin sidebar — same collapsible sections as every other admin page --}}
-{{-- Main content --}}
+    
+
     <main class="main">
 
         <div class="page-head">
@@ -445,50 +429,55 @@
                 <p>Manage your administrative information and account details</p>
             </div>
             <div class="page-actions">
-                <form action="{{ route('logout') }}" method="POST" style="display:inline;">
-                    @csrf
+                <form action="<?php echo e(route('logout')); ?>" method="POST" style="display:inline;">
+                    <?php echo csrf_field(); ?>
                     <button class="btn-logout" type="submit">Logout</button>
                 </form>
                 <button class="btn-edit-profile" type="button" onclick="openEditModal('personal')">Edit Profile</button>
             </div>
         </div>
 
-        {{-- ══════════════ IDENTITY CARD ══════════════ --}}
+        
         <section class="profile-card">
             <div class="avatar-ring"
-                 @if($user->avatar_url ?? null) style="background-image:url('{{ $user->avatar_url }}')" @endif>
-                @unless($user->avatar_url ?? null)
+                 <?php if($user->avatar_url ?? null): ?> style="background-image:url('<?php echo e($user->avatar_url); ?>')" <?php endif; ?>>
+                <?php if (! ($user->avatar_url ?? null)): ?>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></svg>
-                @endunless
+                <?php endif; ?>
             </div>
             <div class="identity">
-                <h3>{{ $user->name ?? 'Administrator' }}<span class="role-pill">{{ $user->role ?? 'Administrator' }}</span></h3>
+                <h3><?php echo e($user->name ?? 'Administrator'); ?><span class="role-pill"><?php echo e($user->role ?? 'Administrator'); ?></span></h3>
                 <div class="identity-grid">
                     <span class="id-item">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                        {{ $user->phone ?: '—' }}
+                        <?php echo e($user->phone ?: '—'); ?>
+
                     </span>
                     <span class="id-item">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
-                        {{ $user->email ?? '—' }}
+                        <?php echo e($user->email ?? '—'); ?>
+
                     </span>
                     <span class="id-item">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></svg>
-                        {{ $user->username ?: '—' }}
+                        <?php echo e($user->username ?: '—'); ?>
+
                     </span>
                     <span class="id-item">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                        {{ $user->location ?: '—' }}
+                        <?php echo e($user->location ?: '—'); ?>
+
                     </span>
                     <span class="id-item">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 9h12"/><path d="M6 13h8"/></svg>
-                        {{ $user->user_code ?? '—' }}
+                        <?php echo e($user->user_code ?? '—'); ?>
+
                     </span>
                 </div>
             </div>
         </section>
 
-        {{-- ══════════════ ABOUT + ACCOUNT ══════════════ --}}
+        
         <div class="two-col">
 
             <section class="panel" style="margin-bottom:28px;">
@@ -499,18 +488,18 @@
                     <h4>About Me</h4>
                 </div>
                 <div class="panel-body">
-                    <p class="about-intro">{{ $user->about ?: 'No summary provided yet.' }}</p>
+                    <p class="about-intro"><?php echo e($user->about ?: 'No summary provided yet.'); ?></p>
                     <div class="about-row">
                         <span class="about-label">Bio</span>
-                        <span class="about-value">{{ $user->bio ?: 'No bio provided yet.' }}</span>
+                        <span class="about-value"><?php echo e($user->bio ?: 'No bio provided yet.'); ?></span>
                     </div>
                     <div class="about-row">
                         <span class="about-label">Role</span>
-                        <span class="about-value">{{ $user->role ?? 'Administrator' }}</span>
+                        <span class="about-value"><?php echo e($user->role ?? 'Administrator'); ?></span>
                     </div>
                     <div class="about-row">
                         <span class="about-label">Member Since</span>
-                        <span class="about-value">{{ optional($user->created_at)->format('M j, Y') ?? '—' }}</span>
+                        <span class="about-value"><?php echo e(optional($user->created_at)->format('M j, Y') ?? '—'); ?></span>
                     </div>
                 </div>
             </section>
@@ -525,11 +514,11 @@
                 <div class="panel-body">
                     <div class="about-row">
                         <span class="about-label">Username</span>
-                        <span class="about-value">{{ $user->username ?: '—' }}</span>
+                        <span class="about-value"><?php echo e($user->username ?: '—'); ?></span>
                     </div>
                     <div class="about-row">
                         <span class="about-label">Email</span>
-                        <span class="about-value">{{ $user->email ?? '—' }}</span>
+                        <span class="about-value"><?php echo e($user->email ?? '—'); ?></span>
                     </div>
                     <div class="about-row">
                         <span class="about-label">Password</span>
@@ -537,7 +526,7 @@
                     </div>
                     <div class="about-row">
                         <span class="about-label">Status</span>
-                        <span class="about-value">{{ ($user->is_active ?? true) ? 'Active' : 'Inactive' }}</span>
+                        <span class="about-value"><?php echo e(($user->is_active ?? true) ? 'Active' : 'Inactive'); ?></span>
                     </div>
                 </div>
             </section>
@@ -546,7 +535,7 @@
     </main>
 </div>
 
-{{-- ══════════════ EDIT PROFILE DRAWER ══════════════ --}}
+
 <div id="editModal" class="modal-overlay" onclick="handleOverlayClick(event)">
     <div class="modal-panel">
 
@@ -569,27 +558,27 @@
             <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">Account Settings</button>
         </div>
 
-        <form id="editProfileForm" action="{{ route('admin.profile.update') }}" method="POST">
-            @csrf
-            @method('PATCH')
+        <form id="editProfileForm" action="<?php echo e(route('admin.profile.update')); ?>" method="POST">
+            <?php echo csrf_field(); ?>
+            <?php echo method_field('PATCH'); ?>
 
             <div class="modal-body">
 
-                @if ($errors->any())
+                <?php if($errors->any()): ?>
                     <div class="form-errors">
-                        @foreach ($errors->all() as $error)<div>{{ $error }}</div>@endforeach
+                        <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><div><?php echo e($error); ?></div><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
-                @endif
+                <?php endif; ?>
 
-                {{-- ─────────── PERSONAL INFO ─────────── --}}
+                
                 <div id="tab-personal" class="tab-content active">
 
                     <div class="avatar-upload-area">
                         <div class="avatar-preview" id="avatarPreview"
-                             @if($user->avatar_url ?? null) style="background-image:url('{{ $user->avatar_url }}')" @endif>
-                            @unless($user->avatar_url ?? null)
+                             <?php if($user->avatar_url ?? null): ?> style="background-image:url('<?php echo e($user->avatar_url); ?>')" <?php endif; ?>>
+                            <?php if (! ($user->avatar_url ?? null)): ?>
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></svg>
-                            @endunless
+                            <?php endif; ?>
                         </div>
                         <div class="avatar-upload-text">
                             <label class="btn-upload-avatar">
@@ -605,78 +594,104 @@
 
                     <div class="form-divider"></div>
 
-                    {{-- The admin record stores the name in parts. Editing a
-                         single combined field folded middle_name and suffix
-                         into last_name on every save. --}}
+                    
                     <div class="form-row">
                         <div class="form-group">
                             <label for="first_name">First Name</label>
-                            <input id="first_name" name="first_name" value="{{ old('first_name', $user->first_name ?? '') }}" required>
-                            @error('first_name')<div class="field-err">{{ $message }}</div>@enderror
+                            <input id="first_name" name="first_name" value="<?php echo e(old('first_name', $user->first_name ?? '')); ?>" required>
+                            <?php $__errorArgs = ['first_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><div class="field-err"><?php echo e($message); ?></div><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
                         <div class="form-group">
                             <label for="middle_name">Middle Name</label>
-                            <input id="middle_name" name="middle_name" value="{{ old('middle_name', $user->middle_name ?? '') }}">
+                            <input id="middle_name" name="middle_name" value="<?php echo e(old('middle_name', $user->middle_name ?? '')); ?>">
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
                             <label for="last_name">Last Name</label>
-                            <input id="last_name" name="last_name" value="{{ old('last_name', $user->last_name ?? '') }}" required>
-                            @error('last_name')<div class="field-err">{{ $message }}</div>@enderror
+                            <input id="last_name" name="last_name" value="<?php echo e(old('last_name', $user->last_name ?? '')); ?>" required>
+                            <?php $__errorArgs = ['last_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><div class="field-err"><?php echo e($message); ?></div><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
                         <div class="form-group">
                             <label for="suffix">Suffix</label>
-                            <input id="suffix" name="suffix" value="{{ old('suffix', $user->suffix ?? '') }}" placeholder="Jr., III, ...">
+                            <input id="suffix" name="suffix" value="<?php echo e(old('suffix', $user->suffix ?? '')); ?>" placeholder="Jr., III, ...">
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
                             <label for="phone">Phone Number</label>
-                            <input id="phone" name="phone" value="{{ old('phone', $user->phone ?? '') }}" placeholder="09XX XXX XXXX">
+                            <input id="phone" name="phone" value="<?php echo e(old('phone', $user->phone ?? '')); ?>" placeholder="09XX XXX XXXX">
                         </div>
                         <div class="form-group">
                             <label for="location">Location</label>
-                            <input id="location" name="location" value="{{ old('location', $user->location ?? '') }}">
+                            <input id="location" name="location" value="<?php echo e(old('location', $user->location ?? '')); ?>">
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label for="role">Role / Title</label>
-                        <input id="role" name="role" value="{{ old('role', $user->role ?? 'Administrator') }}">
+                        <input id="role" name="role" value="<?php echo e(old('role', $user->role ?? 'Administrator')); ?>">
                     </div>
                 </div>
 
-                {{-- ─────────── ABOUT ME ─────────── --}}
+                
                 <div id="tab-about" class="tab-content">
                     <div class="form-group">
                         <label for="about">About Me</label>
-                        <textarea id="about" name="about" rows="4" placeholder="A short summary shown on your profile.">{{ old('about', $user->about ?? '') }}</textarea>
+                        <textarea id="about" name="about" rows="4" placeholder="A short summary shown on your profile."><?php echo e(old('about', $user->about ?? '')); ?></textarea>
                     </div>
                     <div class="form-group">
                         <label for="bio">Bio</label>
-                        <textarea id="bio" name="bio" rows="4" placeholder="Anything else worth noting.">{{ old('bio', $user->bio ?? '') }}</textarea>
+                        <textarea id="bio" name="bio" rows="4" placeholder="Anything else worth noting."><?php echo e(old('bio', $user->bio ?? '')); ?></textarea>
                     </div>
                 </div>
 
-                {{-- ─────────── ACCOUNT SETTINGS ─────────── --}}
+                
                 <div id="tab-settings" class="tab-content">
 
                     <div class="form-section-label">Sign-in Details</div>
 
                     <div class="form-group">
                         <label for="username">Username</label>
-                        <input id="username" name="username" value="{{ old('username', $user->username ?? '') }}" autocomplete="username" required>
+                        <input id="username" name="username" value="<?php echo e(old('username', $user->username ?? '')); ?>" autocomplete="username" required>
                         <p class="hint-muted">Letters, numbers, dashes and underscores. You can sign in with this or your email.</p>
-                        @error('username')<div class="field-err">{{ $message }}</div>@enderror
+                        <?php $__errorArgs = ['username'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><div class="field-err"><?php echo e($message); ?></div><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
 
                     <div class="form-group">
                         <label for="email">Email</label>
-                        <input id="email" name="email" type="email" value="{{ old('email', $user->email ?? '') }}" required>
-                        @error('email')<div class="field-err">{{ $message }}</div>@enderror
+                        <input id="email" name="email" type="email" value="<?php echo e(old('email', $user->email ?? '')); ?>" required>
+                        <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><div class="field-err"><?php echo e($message); ?></div><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
 
                     <div class="form-divider"></div>
@@ -692,7 +707,14 @@
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                             </button>
                         </div>
-                        @error('current_password')<div class="field-err">{{ $message }}</div>@enderror
+                        <?php $__errorArgs = ['current_password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><div class="field-err"><?php echo e($message); ?></div><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
 
                     <div class="form-group">
@@ -703,7 +725,14 @@
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                             </button>
                         </div>
-                        @error('password')<div class="field-err">{{ $message }}</div>@enderror
+                        <?php $__errorArgs = ['password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><div class="field-err"><?php echo e($message); ?></div><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
 
                     <div class="form-group">
@@ -717,7 +746,7 @@
                     </div>
                 </div>
 
-            </div>{{-- /.modal-body --}}
+            </div>
 
             <div class="modal-footer">
                 <button type="button" class="btn-cancel-modal" onclick="closeEditModal()">Cancel</button>
@@ -725,7 +754,7 @@
             </div>
         </form>
     </div>
-</div>{{-- /.modal-overlay --}}
+</div>
 
 <script>
 /* ====== Edit Profile Modal ====== */
@@ -808,13 +837,13 @@ document.addEventListener('keydown', e => {
 
 /* Re-open the drawer automatically if the save failed validation, on the
    tab that actually holds the offending field. */
-@if ($errors->any())
-openEditModal(@json(
+<?php if($errors->any()): ?>
+openEditModal(<?php echo json_encode(
     $errors->has('current_password') || $errors->has('password')
         || $errors->has('email') || $errors->has('username')
     ? 'settings' : 'personal'
-));
-@endif
+, 15, 512) ?>);
+<?php endif; ?>
 
 /* ====== Success Toast ====== */
 (function () {
@@ -826,7 +855,7 @@ openEditModal(@json(
 </script>
 
 
-{{-- ── Back to top (appears on long pages) ── --}}
+
 <button id="back-to-top-btn" type="button" title="Back to top" aria-label="Back to top"
         onclick="window.scrollTo({top:0,behavior:'smooth'});">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
@@ -856,10 +885,11 @@ openEditModal(@json(
     }
 </script>
 
-{{-- Shared Admin sidebar styling (floating card + section pills) --}}
-@include('components.admin-sidebar')
 
-{{-- Shared responsiveness layer (drawer nav + grid stacking) --}}
-@include('components.responsive')
+<?php echo $__env->make('components.admin-sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+
+
+<?php echo $__env->make('components.responsive', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
 </html>
+<?php /**PATH C:\Users\PaulV\Documents\MICROCREDENTIALS NEW ADDITIONS\UPSKILL - Microcredential Platform\resources\views/admin/profile.blade.php ENDPATH**/ ?>

@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upskill – User Management</title>
 
-    <link rel="icon" type="image/png" href="{{ asset('images/PSU-Logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('images/PSU-Logo.png') }}">
+    <link rel="icon" type="image/png" href="<?php echo e(asset('images/PSU-Logo.png')); ?>">
+    <link rel="apple-touch-icon" href="<?php echo e(asset('images/PSU-Logo.png')); ?>">
 
     <style>
         /* =========================================================
@@ -420,63 +420,63 @@
 </head>
 
 <body>
-    {{-- TOP NAV --}}
-    @include('components.authenticated-topbar', ['user' => auth()->user()])
+    
+    <?php echo $__env->make('components.authenticated-topbar', ['user' => auth()->user()], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
     <div class="layout admin-layout">
 
-        {{-- SHARED ADMIN SIDEBAR --}}
-        @include('components.admin-sidebar')
+        
+        <?php echo $__env->make('components.admin-sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-        {{-- MAIN CONTENT --}}
+        
         <main class="main">
 
             <div class="user-tools">
-                @php $roleTab = $roleTab ?? 'students'; @endphp
+                <?php $roleTab = $roleTab ?? 'students'; ?>
 
                 <div class="role-tabs">
-                    <a href="{{ route('admin.usermanagement', array_merge(request()->except('role','page'), ['role' => 'students'])) }}"
-                       class="role-tab {{ $roleTab === 'students' ? 'active' : '' }}">
+                    <a href="<?php echo e(route('admin.usermanagement', array_merge(request()->except('role','page'), ['role' => 'students']))); ?>"
+                       class="role-tab <?php echo e($roleTab === 'students' ? 'active' : ''); ?>">
                         Students
                     </a>
 
-                    <a href="{{ route('admin.usermanagement', array_merge(request()->except('role','page'), ['role' => 'faculty'])) }}"
-                       class="role-tab {{ $roleTab === 'faculty' ? 'active' : '' }}">
+                    <a href="<?php echo e(route('admin.usermanagement', array_merge(request()->except('role','page'), ['role' => 'faculty']))); ?>"
+                       class="role-tab <?php echo e($roleTab === 'faculty' ? 'active' : ''); ?>">
                         Faculty
                     </a>
                 </div>
 
-                <form class="user-search-form" action="{{ route('admin.usermanagement') }}" method="GET">
-                    <input type="hidden" name="role" value="{{ $roleTab }}">
+                <form class="user-search-form" action="<?php echo e(route('admin.usermanagement')); ?>" method="GET">
+                    <input type="hidden" name="role" value="<?php echo e($roleTab); ?>">
 
                     <input type="text"
                            name="q"
-                           value="{{ $q ?? '' }}"
+                           value="<?php echo e($q ?? ''); ?>"
                            placeholder="Search by name, email, or user code">
 
                     <select name="sort">
-                        <option value="created_at" {{ ($sort ?? 'created_at') === 'created_at' ? 'selected' : '' }}>
+                        <option value="created_at" <?php echo e(($sort ?? 'created_at') === 'created_at' ? 'selected' : ''); ?>>
                             Newest
                         </option>
-                        <option value="name" {{ ($sort ?? '') === 'name' ? 'selected' : '' }}>
+                        <option value="name" <?php echo e(($sort ?? '') === 'name' ? 'selected' : ''); ?>>
                             Name
                         </option>
-                        <option value="user_code" {{ ($sort ?? '') === 'user_code' ? 'selected' : '' }}>
+                        <option value="user_code" <?php echo e(($sort ?? '') === 'user_code' ? 'selected' : ''); ?>>
                             User Code
                         </option>
                     </select>
 
-                    <input type="hidden" name="direction" value="{{ $direction === 'asc' ? 'desc' : 'asc' }}">
+                    <input type="hidden" name="direction" value="<?php echo e($direction === 'asc' ? 'desc' : 'asc'); ?>">
 
                     <button type="submit">Filter</button>
                 </form>
             </div>
 
-            @if ($users->isEmpty())
+            <?php if($users->isEmpty()): ?>
                 <div class="empty-state">
                     No users found for the current filter.
                 </div>
-            @else
+            <?php else: ?>
                 <div class="table-card">
                     <table class="um-table">
                         <thead>
@@ -491,47 +491,50 @@
                         </thead>
 
                         <tbody>
-                            @foreach ($users as $user)
+                            <?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <tr class="um-row-click"
-                                    onclick="window.location='{{ route('admin.users.show', $user->id) }}'"
+                                    onclick="window.location='<?php echo e(route('admin.users.show', $user->id)); ?>'"
                                     title="View details">
 
                                     <td>
-                                        {{ trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) ?: ($user->username ?? '—') }}
+                                        <?php echo e(trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) ?: ($user->username ?? '—')); ?>
+
                                     </td>
 
-                                    <td>{{ $user->email }}</td>
+                                    <td><?php echo e($user->email); ?></td>
 
                                     <td>
-                                        {{ match ((int) ($user->role_id ?? 3)) {
+                                        <?php echo e(match ((int) ($user->role_id ?? 3)) {
                                             1 => 'Administrator',
                                             2 => 'Faculty',
                                             3 => 'Learner',
                                             default => 'Learner'
-                                        } }}
+                                        }); ?>
+
                                     </td>
 
                                     <td>
-                                        <span class="code-pill">{{ $user->user_code ?? '—' }}</span>
+                                        <span class="code-pill"><?php echo e($user->user_code ?? '—'); ?></span>
                                     </td>
 
                                     <td>
-                                        <span class="status-badge {{ $user->is_active ? 'status-active' : 'status-pending' }}">
-                                            {{ $user->is_active ? 'Active' : 'Inactive' }}
+                                        <span class="status-badge <?php echo e($user->is_active ? 'status-active' : 'status-pending'); ?>">
+                                            <?php echo e($user->is_active ? 'Active' : 'Inactive'); ?>
+
                                         </span>
                                     </td>
 
-                                    {{-- Delete action --}}
+                                    
                                     <td style="text-align:right;" onclick="event.stopPropagation();">
-                                        @if ((int) ($user->role_id ?? 3) === 1)
+                                        <?php if((int) ($user->role_id ?? 3) === 1): ?>
                                             <span style="color:#9ca3af;font-size:12px;">&mdash;</span>
-                                        @else
+                                        <?php else: ?>
                                             <form method="POST"
-                                                  action="{{ route('admin.users.destroy', $user->id) }}"
+                                                  action="<?php echo e(route('admin.users.destroy', $user->id)); ?>"
                                                   style="display:inline;"
-                                                  onsubmit="event.stopPropagation(); return confirm('Delete {{ addslashes(trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''))) }}? This cannot be undone.');">
+                                                  onsubmit="event.stopPropagation(); return confirm('Delete <?php echo e(addslashes(trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')))); ?>? This cannot be undone.');">
 
-                                                @csrf
+                                                <?php echo csrf_field(); ?>
 
                                                 <button type="submit"
                                                         onclick="event.stopPropagation();"
@@ -539,19 +542,19 @@
                                                     Delete
                                                 </button>
                                             </form>
-                                        @endif
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </tbody>
                     </table>
                 </div>
-            @endif
+            <?php endif; ?>
 
         </main>
     </div>
 
-    {{-- SCRIPTS --}}
+    
     <script>
         function toggleSection(id) {
             const section = document.getElementById(id);
@@ -560,7 +563,7 @@
         }
     </script>
 
-    {{-- Back to top --}}
+    
     <button id="back-to-top-btn"
             type="button"
             title="Back to top"
@@ -621,7 +624,7 @@
         })();
     </script>
 
-    {{-- Shared responsiveness layer --}}
-    @include('components.responsive')
+    
+    <?php echo $__env->make('components.responsive', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
-</html>
+</html><?php /**PATH C:\Users\PaulV\Documents\MICROCREDENTIALS NEW ADDITIONS\UPSKILL - Microcredential Platform\resources\views/admin/users/index.blade.php ENDPATH**/ ?>

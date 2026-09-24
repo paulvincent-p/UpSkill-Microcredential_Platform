@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upskill – Admin Dashboard</title>
 
-    <link rel="icon" type="image/png" href="{{ asset('images/PSU-Logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('images/PSU-Logo.png') }}">
+    <link rel="icon" type="image/png" href="<?php echo e(asset('images/PSU-Logo.png')); ?>">
+    <link rel="apple-touch-icon" href="<?php echo e(asset('images/PSU-Logo.png')); ?>">
 
     <style>
         /* =========================================================
@@ -453,17 +453,17 @@
 
 <body>
 
-    @include('components.authenticated-topbar', ['user' => auth()->user()])
+    <?php echo $__env->make('components.authenticated-topbar', ['user' => auth()->user()], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
     <div class="layout">
-        @include('components.admin-sidebar')
+        <?php echo $__env->make('components.admin-sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
         <main class="main">
 
             <div class="page-heading">Welcome back, Admin</div>
             <div class="page-sub">Here's what's happening on your platform today.</div>
 
-            {{-- STAT CARDS --}}
+            
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-val" id="live-active-users">0</div>
@@ -486,7 +486,7 @@
                 </div>
             </div>
 
-            {{-- LIVE MONITORING + PLATFORM SNAPSHOT --}}
+            
             <div class="two-col" style="margin-bottom: 18px;">
                 <div class="card">
                     <div class="card-hd">
@@ -502,123 +502,127 @@
 
                     <div class="chart-row">
                         <div class="chart-lbl">
-                            Students on platform &ndash; {{ $stats['total_students'] }}
+                            Students on platform &ndash; <?php echo e($stats['total_students']); ?>
+
                         </div>
                     </div>
 
                     <div class="chart-row">
                         <div class="chart-lbl">
-                            Badges issued &ndash; {{ $stats['badges_issued'] }}
+                            Badges issued &ndash; <?php echo e($stats['badges_issued']); ?>
+
                         </div>
                     </div>
 
                     <div class="chart-row">
                         <div class="chart-lbl">
-                            Average quiz score &ndash; {{ $stats['course_score_avg'] }}%
+                            Average quiz score &ndash; <?php echo e($stats['course_score_avg']); ?>%
                         </div>
                     </div>
 
                     <div class="chart-row">
                         <div class="chart-lbl">
-                            Enrollments recorded &ndash; {{ $stats['students_enrolled'] }}
+                            Enrollments recorded &ndash; <?php echo e($stats['students_enrolled']); ?>
+
                         </div>
                     </div>
                 </div>
             </div>
 
-            {{-- ACTIVE COURSES + RECENT BADGES --}}
+            
             <div class="two-col">
 
-                {{-- Active Courses --}}
+                
                 <div class="card">
                     <div class="card-hd">
                         <span class="card-title">Active Courses</span>
-                        <a href="{{ route('courses.browse') }}" class="view-all">View All</a>
+                        <a href="<?php echo e(route('courses.browse')); ?>" class="view-all">View All</a>
                     </div>
 
-                    @foreach ($activeCourses as $course)
+                    <?php $__currentLoopData = $activeCourses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="course-item">
                             <div class="course-thumb">
-                                @if ($course->thumbnail_url)
-                                    <img src="{{ $course->thumbnail_url }}"
-                                         alt="{{ $course->title }}"
+                                <?php if($course->thumbnail_url): ?>
+                                    <img src="<?php echo e($course->thumbnail_url); ?>"
+                                         alt="<?php echo e($course->title); ?>"
                                          style="width:100%;height:100%;object-fit:cover;">
-                                @endif
+                                <?php endif; ?>
                             </div>
 
                             <div class="course-body">
-                                <div class="course-name">{{ $course->title }}</div>
-                                <div class="course-meta">{{ $course->meta }}</div>
+                                <div class="course-name"><?php echo e($course->title); ?></div>
+                                <div class="course-meta"><?php echo e($course->meta); ?></div>
                             </div>
 
-                            <div class="course-pct">{{ $course->percent }}%</div>
+                            <div class="course-pct"><?php echo e($course->percent); ?>%</div>
                         </div>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
 
-                {{-- Recent Badges --}}
+                
                 <div class="card">
                     <div class="card-hd">
                         <span class="card-title">Recent Badges</span>
                     </div>
 
                     <div class="badges-grid" id="recent-badges-grid">
-                        @foreach ($recentBadges as $badge)
+                        <?php $__currentLoopData = $recentBadges; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $badge): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="badge-card">
-                                <div class="badge-name">{{ $badge->name }}</div>
-                                <div class="badge-count">{{ $badge->earned_count }} Earned</div>
+                                <div class="badge-name"><?php echo e($badge->name); ?></div>
+                                <div class="badge-count"><?php echo e($badge->earned_count); ?> Earned</div>
                             </div>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                 </div>
             </div>
 
-            {{-- ENROLLMENT + COMPLETION CHARTS --}}
+            
             <div class="two-col">
 
-                {{-- Enrollment by Courses --}}
+                
                 <div class="card">
                     <div class="card-hd">
                         <span class="card-title">Enrollment by Courses</span>
                     </div>
 
-                    @foreach ($enrollmentByCourse as $row)
+                    <?php $__currentLoopData = $enrollmentByCourse; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $row): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="chart-row">
                             <div class="chart-lbl">
-                                {{ $row->label }} &ndash; {{ $row->value }}
+                                <?php echo e($row->label); ?> &ndash; <?php echo e($row->value); ?>
+
                             </div>
 
                             <div class="bar-track">
-                                <div class="bar-fill" style="width:{{ $row->percent }}%"></div>
+                                <div class="bar-fill" style="width:<?php echo e($row->percent); ?>%"></div>
                             </div>
                         </div>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
 
-                {{-- Completion Rate --}}
+                
                 <div class="card">
                     <div class="card-hd">
                         <span class="card-title">Completion Rate</span>
                     </div>
 
-                    @foreach ($completionRate as $row)
+                    <?php $__currentLoopData = $completionRate; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $row): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="chart-row">
                             <div class="chart-lbl">
-                                {{ $row->label }} &ndash; {{ $row->value }}%
+                                <?php echo e($row->label); ?> &ndash; <?php echo e($row->value); ?>%
                             </div>
 
                             <div class="bar-track">
-                                <div class="bar-fill" style="width:{{ $row->percent }}%"></div>
+                                <div class="bar-fill" style="width:<?php echo e($row->percent); ?>%"></div>
                             </div>
                         </div>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
             </div>
 
         </main>
     </div>
 
-    {{-- SCRIPTS --}}
+    
     <script>
         function toggleSection(id) {
             const section = document.getElementById(id);
@@ -627,7 +631,7 @@
         }
 
         function refreshLiveMonitoring() {
-            const liveUrl = '{{ route('monitoring.live') }}';
+            const liveUrl = '<?php echo e(route('monitoring.live')); ?>';
 
             fetch(liveUrl)
                 .then(response => {
@@ -717,4 +721,4 @@
     </script>
 
 </body>
-</html>
+</html><?php /**PATH C:\Users\PaulV\Documents\MICROCREDENTIALS NEW ADDITIONS\UPSKILL - Microcredential Platform\resources\views/admin/dashboard.blade.php ENDPATH**/ ?>

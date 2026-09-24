@@ -1,26 +1,13 @@
-{{--
-    resources/views/admin/Faculty_Codes.blade.php
 
-    Admin › Faculty Codes — /Admin-facultycodes (admin.facultycodes)
-
-    Shareable registration codes for faculty staff:
-      • GREEN status = code is still available (can be shared)
-      • RED status   = code has already been used for a faculty account
-
-    Expected data from AdminController::facultyCodes():
-        'codes' => collection of objects, each exposing:
-            ->id, ->code, ->is_used (bool), ->used_by_name (string|null),
-            ->used_at (Carbon|null), ->created_at (Carbon)
---}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Faculty Codes | Upskill Admin</title>
-    {{-- Browser tab icon (favicon) --}}
-    <link rel="icon" type="image/png" href="{{ asset('images/PSU-Logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('images/PSU-Logo.png') }}">
+    
+    <link rel="icon" type="image/png" href="<?php echo e(asset('images/PSU-Logo.png')); ?>">
+    <link rel="apple-touch-icon" href="<?php echo e(asset('images/PSU-Logo.png')); ?>">
 <style>
     :root{
         --navy:#13176b;
@@ -99,15 +86,15 @@
 </style>
 </head>
 <body>
-@include('components.authenticated-topbar', ['user' => auth()->user()])
+<?php echo $__env->make('components.authenticated-topbar', ['user' => auth()->user()], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 <style>.topbar{display:none!important;}.wrap{margin-top:0!important;}</style>
-@if(false)
+<?php if(false): ?>
 
-{{-- ════════════════════════════════════ TOP NAV ══════════════════════════════════ --}}
+
 <nav class="topbar" hidden aria-hidden="true">
-    <a href="{{ route('Homepage') }}" class="topbar-brand">
+    <a href="<?php echo e(route('Homepage')); ?>" class="topbar-brand">
         <div class="brand-logo">
-            <img src="{{ asset('images/PSU-Logo.png') }}" alt="PSU Logo"
+            <img src="<?php echo e(asset('images/PSU-Logo.png')); ?>" alt="PSU Logo"
                  width="38" height="38"
                  style="width:38px;height:38px;object-fit:contain;border-radius:50%;">
         </div>
@@ -116,33 +103,33 @@
 
     <div class="topbar-right">
 
-        <a href="{{ route('notifications.index') }}" class="avatar-btn" title="Notifications">
+        <a href="<?php echo e(route('notifications.index')); ?>" class="avatar-btn" title="Notifications">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                 <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>
             </svg>
         </a>
-        <a href="{{ route('admin.profile') }}" class="avatar-btn" title="My Profile"
-           @if(auth()->user()?->avatar_url)
-               style="background-image:url('{{ auth()->user()->avatar_url }}');background-size:cover;background-position:center;overflow:hidden;"
-           @endif>
-            @unless(auth()->user()?->avatar_url)
+        <a href="<?php echo e(route('admin.profile')); ?>" class="avatar-btn" title="My Profile"
+           <?php if(auth()->user()?->avatar_url): ?>
+               style="background-image:url('<?php echo e(auth()->user()->avatar_url); ?>');background-size:cover;background-position:center;overflow:hidden;"
+           <?php endif; ?>>
+            <?php if (! (auth()->user()?->avatar_url)): ?>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8V21.6h19.2V19.2c0-3.2-6.4-4.8-9.6-4.8z"/>
             </svg>
-            @endunless
+            <?php endif; ?>
         </a>
-        <form action="{{ route('logout') }}" method="POST" style="display:inline-flex;align-items:center;">
-            @csrf
+        <form action="<?php echo e(route('logout')); ?>" method="POST" style="display:inline-flex;align-items:center;">
+            <?php echo csrf_field(); ?>
             <button type="submit" style="background:#fff1f2;border:1px solid #fecdd3;color:#b91c1c;border-radius:999px;padding:8px 12px;font-weight:700;cursor:pointer;">Logout</button>
         </form>
     </div>
 </nav>
-@endif
+<?php endif; ?>
 
 <div class="layout">
 
-{{-- ════════════════════════════════════ SIDEBAR ══════════════════════════════════ --}}
-{{-- ════════════════════════════════════ MAIN CONTENT ═════════════════════════════ --}}
+
+
 <main class="main">
 
     <div class="page-head">
@@ -150,8 +137,8 @@
             <h2 class="page-title">Faculty Codes</h2>
             <p class="page-sub">Generate and share registration codes with faculty staff. Green = available · Red = already used.</p>
         </div>
-        <form method="POST" action="{{ route('admin.facultycodes.generate') }}">
-            @csrf
+        <form method="POST" action="<?php echo e(route('admin.facultycodes.generate')); ?>">
+            <?php echo csrf_field(); ?>
             <button type="submit" class="btn-generate">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
                     <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
@@ -161,36 +148,36 @@
         </form>
     </div>
 
-    @if (session('success'))
-        <div class="alert-success">{{ session('success') }}</div>
-    @endif
+    <?php if(session('success')): ?>
+        <div class="alert-success"><?php echo e(session('success')); ?></div>
+    <?php endif; ?>
 
-    @php
+    <?php
         $availableCount = $codes->where('is_used', false)->count();
         $usedCount      = $codes->where('is_used', true)->count();
-    @endphp
+    ?>
 
     <div class="code-stats">
         <div class="code-stat">
-            <div class="num">{{ $codes->count() }}</div>
+            <div class="num"><?php echo e($codes->count()); ?></div>
             <div class="lbl">Total Codes</div>
         </div>
         <div class="code-stat">
-            <div class="num green">{{ $availableCount }}</div>
+            <div class="num green"><?php echo e($availableCount); ?></div>
             <div class="lbl">Available</div>
         </div>
         <div class="code-stat">
-            <div class="num red">{{ $usedCount }}</div>
+            <div class="num red"><?php echo e($usedCount); ?></div>
             <div class="lbl">Used</div>
         </div>
     </div>
 
-    @if ($codes->isEmpty())
+    <?php if($codes->isEmpty()): ?>
         <div class="empty-state">
             <h4>No faculty codes yet</h4>
             <p>Click "Generate New Code" above to create the first one.</p>
         </div>
-    @else
+    <?php else: ?>
         <div class="table-card">
             <table class="um-table">
                 <thead>
@@ -203,50 +190,51 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($codes as $code)
+                    <?php $__currentLoopData = $codes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $code): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr>
-                        <td><span class="code-pill">{{ $code->code }}</span></td>
+                        <td><span class="code-pill"><?php echo e($code->code); ?></span></td>
                         <td>
-                            @if ($code->is_used)
+                            <?php if($code->is_used): ?>
                                 <span class="status-badge status-used">
                                     <span class="status-dot"></span> Used
                                 </span>
-                            @else
+                            <?php else: ?>
                                 <span class="status-badge status-available">
                                     <span class="status-dot"></span> Available
                                 </span>
-                            @endif
+                            <?php endif; ?>
                         </td>
                         <td>
-                            @if ($code->is_used)
-                                {{ $code->used_by_name ?? '—' }}
-                                <div style="font-size:0.75rem;color:var(--text-muted);">{{ $code->used_at?->format('M j, Y g:i A') }}</div>
-                            @else
+                            <?php if($code->is_used): ?>
+                                <?php echo e($code->used_by_name ?? '—'); ?>
+
+                                <div style="font-size:0.75rem;color:var(--text-muted);"><?php echo e($code->used_at?->format('M j, Y g:i A')); ?></div>
+                            <?php else: ?>
                                 <span style="color:var(--text-muted);">—</span>
-                            @endif
+                            <?php endif; ?>
                         </td>
-                        <td>{{ $code->created_at?->format('M j, Y') }}</td>
+                        <td><?php echo e($code->created_at?->format('M j, Y')); ?></td>
                         <td>
                             <div style="display:flex;gap:8px;align-items:center;">
-                                <button type="button" class="btn-copy" onclick="copyCode(this, '{{ $code->code }}')">Copy</button>
-                                @unless ($code->is_used)
-                                    <form method="POST" action="{{ route('admin.facultycodes.delete', $code->id) }}"
+                                <button type="button" class="btn-copy" onclick="copyCode(this, '<?php echo e($code->code); ?>')">Copy</button>
+                                <?php if (! ($code->is_used)): ?>
+                                    <form method="POST" action="<?php echo e(route('admin.facultycodes.delete', $code->id)); ?>"
                                           onsubmit="return confirm('Delete this unused code?');" style="margin:0;">
-                                        @csrf
+                                        <?php echo csrf_field(); ?>
                                         <button type="submit" class="btn-delete">Delete</button>
                                     </form>
-                                @endunless
+                                <?php endif; ?>
                             </div>
                         </td>
                     </tr>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </tbody>
             </table>
         </div>
-    @endif
+    <?php endif; ?>
 
 </main>
-</div>{{-- /layout --}}
+</div>
 
 <script>
     function toggleSection(id) {
@@ -276,7 +264,7 @@
 </script>
 
 
-{{-- ── Back to top (appears on long pages) ── --}}
+
 <button id="back-to-top-btn" type="button" title="Back to top" aria-label="Back to top"
         onclick="window.scrollTo({top:0,behavior:'smooth'});">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
@@ -298,10 +286,10 @@
     })();
 </script>
 
-{{-- Shared Admin sidebar styling (floating card + section pills) --}}
-    @include('components.admin-sidebar')
+
+    <?php echo $__env->make('components.admin-sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     
-        {{-- Shared responsiveness layer (drawer nav + grid stacking) --}}
-    @include('components.responsive')
+        
+    <?php echo $__env->make('components.responsive', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
-</html>
+</html><?php /**PATH C:\Users\PaulV\Documents\MICROCREDENTIALS NEW ADDITIONS\UPSKILL - Microcredential Platform\resources\views/admin/faculty-codes.blade.php ENDPATH**/ ?>

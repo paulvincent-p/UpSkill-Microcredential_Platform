@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upskill – Analytics Report</title>
-    {{-- Browser tab icon (favicon) --}}
-    <link rel="icon" type="image/png" href="{{ asset('images/PSU-Logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('images/PSU-Logo.png') }}">
+    
+    <link rel="icon" type="image/png" href="<?php echo e(asset('images/PSU-Logo.png')); ?>">
+    <link rel="apple-touch-icon" href="<?php echo e(asset('images/PSU-Logo.png')); ?>">
     <style>
         /* ─── Reset ─────────────────────────────────────────────── */
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -133,13 +133,13 @@
     </style>
 </head>
 <body>
-{{-- ════════════════════════════════════ TOP NAV ══════════════════════════════════ --}}
-@include('components.authenticated-topbar', ['user' => auth()->user()])
+
+<?php echo $__env->make('components.authenticated-topbar', ['user' => auth()->user()], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 <div class="layout">
 
-{{-- ════════════════════════════════════ SIDEBAR ══════════════════════════════════ --}}
-{{-- Identical to the other admin pages — active pill sits on "Report" --}}
-{{-- ════════════════════════════════════ MAIN CONTENT ═════════════════════════════ --}}
+
+
+
 <main class="main">
     <div class="analytics-page">
         <header class="page-header">
@@ -148,24 +148,24 @@
                 <h1 class="page-title">Platform Analytics</h1>
                 <p class="page-subtitle">Monitor learner engagement, course performance, competencies, and credential outcomes.</p>
             </div>
-            <form class="header-actions analytics-filters" action="{{ route('admin.report') }}" method="GET">
+            <form class="header-actions analytics-filters" action="<?php echo e(route('admin.report')); ?>" method="GET">
                 <div class="segmented" role="group" aria-label="Time period">
-                    <button class="segment {{ $period === 'all' ? 'active' : '' }}" type="submit" name="period" value="all">All Time</button>
-                    <button class="segment {{ $period === 'year' ? 'active' : '' }}" type="submit" name="period" value="year">This Year</button>
-                    <button class="segment {{ $period === 'month' ? 'active' : '' }}" type="submit" name="period" value="month">This Month</button>
-                    <button class="segment {{ $period === 'week' ? 'active' : '' }}" type="submit" name="period" value="week">This Week</button>
+                    <button class="segment <?php echo e($period === 'all' ? 'active' : ''); ?>" type="submit" name="period" value="all">All Time</button>
+                    <button class="segment <?php echo e($period === 'year' ? 'active' : ''); ?>" type="submit" name="period" value="year">This Year</button>
+                    <button class="segment <?php echo e($period === 'month' ? 'active' : ''); ?>" type="submit" name="period" value="month">This Month</button>
+                    <button class="segment <?php echo e($period === 'week' ? 'active' : ''); ?>" type="submit" name="period" value="week">This Week</button>
                 </div>
                 <div class="filter-row">
-                    <select class="filter-select" name="category" aria-label="Category" onchange="this.form.submit()"><option value="">All Categories</option>@foreach ($categoryNames as $categoryName)<option value="{{ $categoryName }}" @selected($filters['category'] === $categoryName)>{{ $categoryName }}</option>@endforeach</select>
-                    <select class="filter-select" name="department" aria-label="Department" onchange="this.form.submit()"><option value="">All Departments</option>@foreach ($departmentNames as $departmentName)<option value="{{ $departmentName }}" @selected($filters['department'] === $departmentName)>{{ $departmentName }}</option>@endforeach</select>
-                    <select class="filter-select" name="course" aria-label="Course" onchange="this.form.submit()"><option value="">All Courses</option>@foreach ($courseOptions as $courseOption)<option value="{{ $courseOption->id }}" @selected((string) $filters['course'] === (string) $courseOption->id)>{{ $courseOption->title }}</option>@endforeach</select>
-                    <select class="filter-select" name="faculty" aria-label="Faculty" onchange="this.form.submit()"><option value="">All Faculty</option>@foreach ($facultyOptions as $facultyOption)<option value="{{ $facultyOption->id }}" @selected((string) $filters['faculty'] === (string) $facultyOption->id)>{{ trim($facultyOption->first_name.' '.$facultyOption->last_name) }}</option>@endforeach</select>
+                    <select class="filter-select" name="category" aria-label="Category" onchange="this.form.submit()"><option value="">All Categories</option><?php $__currentLoopData = $categoryNames; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $categoryName): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><option value="<?php echo e($categoryName); ?>" <?php if($filters['category'] === $categoryName): echo 'selected'; endif; ?>><?php echo e($categoryName); ?></option><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?></select>
+                    <select class="filter-select" name="department" aria-label="Department" onchange="this.form.submit()"><option value="">All Departments</option><?php $__currentLoopData = $departmentNames; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $departmentName): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><option value="<?php echo e($departmentName); ?>" <?php if($filters['department'] === $departmentName): echo 'selected'; endif; ?>><?php echo e($departmentName); ?></option><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?></select>
+                    <select class="filter-select" name="course" aria-label="Course" onchange="this.form.submit()"><option value="">All Courses</option><?php $__currentLoopData = $courseOptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $courseOption): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><option value="<?php echo e($courseOption->id); ?>" <?php if((string) $filters['course'] === (string) $courseOption->id): echo 'selected'; endif; ?>><?php echo e($courseOption->title); ?></option><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?></select>
+                    <select class="filter-select" name="faculty" aria-label="Faculty" onchange="this.form.submit()"><option value="">All Faculty</option><?php $__currentLoopData = $facultyOptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $facultyOption): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><option value="<?php echo e($facultyOption->id); ?>" <?php if((string) $filters['faculty'] === (string) $facultyOption->id): echo 'selected'; endif; ?>><?php echo e(trim($facultyOption->first_name.' '.$facultyOption->last_name)); ?></option><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?></select>
                 </div>
             </form>
         </header>
 
         <section class="stats-grid" aria-label="Key performance indicators">
-            @php
+            <?php
                 $kpis = [
                     ['label' => 'Total Learners', 'value' => number_format($stats['total_students']), 'trend' => 'Live', 'icon' => 'users'],
                     ['label' => 'Active Learners', 'value' => number_format($stats['active_students']), 'trend' => '30 days', 'icon' => 'activity', 'yellow' => true],
@@ -174,20 +174,20 @@
                     ['label' => 'Credentials Issued', 'value' => number_format($stats['credentials']), 'trend' => 'All time', 'icon' => 'award'],
                     ['label' => 'Average Assessment Score', 'value' => $stats['course_score_avg'] . '%', 'trend' => 'Scored attempts', 'icon' => 'chart', 'yellow' => true],
                 ];
-            @endphp
-            @foreach ($kpis as $kpi)
+            ?>
+            <?php $__currentLoopData = $kpis; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $kpi): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <article class="stat-card">
                     <div class="stat-top">
-                        <div class="stat-icon {{ !empty($kpi['yellow']) ? 'yellow' : '' }}">
+                        <div class="stat-icon <?php echo e(!empty($kpi['yellow']) ? 'yellow' : ''); ?>">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>
                         </div>
-                        <span class="stat-trend">{{ $kpi['trend'] }}</span>
+                        <span class="stat-trend"><?php echo e($kpi['trend']); ?></span>
                     </div>
-                    <div class="stat-label">{{ $kpi['label'] }}</div>
-                    <div class="stat-value">{{ $kpi['value'] }}</div>
+                    <div class="stat-label"><?php echo e($kpi['label']); ?></div>
+                    <div class="stat-value"><?php echo e($kpi['value']); ?></div>
                     <div class="stat-label">current platform total</div>
                 </article>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </section>
 
         <section class="dashboard-grid" aria-label="Learner analytics">
@@ -195,21 +195,21 @@
                 <div class="card-heading">
                     <div><h2 class="card-title">Learner Activity &amp; Engagement</h2><p class="card-subtitle">Total activity over time</p></div>
                     <div class="activity-tabs" role="group" aria-label="Activity metric">
-                        <button class="activity-tab {{ $activityMode === 'enrollments' ? 'active' : '' }}" type="button" data-activity="enrollments">Enrollments</button><button class="activity-tab {{ $activityMode === 'active' ? 'active' : '' }}" type="button" data-activity="active">Active Learners</button><button class="activity-tab {{ $activityMode === 'completions' ? 'active' : '' }}" type="button" data-activity="completions">Completions</button>
+                        <button class="activity-tab <?php echo e($activityMode === 'enrollments' ? 'active' : ''); ?>" type="button" data-activity="enrollments">Enrollments</button><button class="activity-tab <?php echo e($activityMode === 'active' ? 'active' : ''); ?>" type="button" data-activity="active">Active Learners</button><button class="activity-tab <?php echo e($activityMode === 'completions' ? 'active' : ''); ?>" type="button" data-activity="completions">Completions</button>
                     </div>
                 </div>
                 <svg class="activity-chart" viewBox="0 0 760 230" preserveAspectRatio="none" role="img" aria-label="Learner activity line chart">
-                    <path class="grid-line" d="M48 25H744M48 70H744M48 115H744M48 160H744M48 205H744"/><polygon class="chart-area" points="48,205 {{ $activity['points'] }} 744,205"/><polyline class="chart-line" points="{{ $activity['points'] }}"/>
-                    <g class="axis-label"><text x="12" y="29">{{ $activity['scale']['max'] }}</text><text x="12" y="74">{{ $activity['scale']['high'] }}</text><text x="12" y="119">{{ $activity['scale']['mid'] }}</text><text x="12" y="164">{{ $activity['scale']['low'] }}</text><text x="20" y="209">0</text>@foreach ($activity['labels'] as $index => $label)<text x="{{ 40 + $index * 87 }}" y="224">{{ $label }}</text>@endforeach</g>
+                    <path class="grid-line" d="M48 25H744M48 70H744M48 115H744M48 160H744M48 205H744"/><polygon class="chart-area" points="48,205 <?php echo e($activity['points']); ?> 744,205"/><polyline class="chart-line" points="<?php echo e($activity['points']); ?>"/>
+                    <g class="axis-label"><text x="12" y="29"><?php echo e($activity['scale']['max']); ?></text><text x="12" y="74"><?php echo e($activity['scale']['high']); ?></text><text x="12" y="119"><?php echo e($activity['scale']['mid']); ?></text><text x="12" y="164"><?php echo e($activity['scale']['low']); ?></text><text x="20" y="209">0</text><?php $__currentLoopData = $activity['labels']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><text x="<?php echo e(40 + $index * 87); ?>" y="224"><?php echo e($label); ?></text><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?></g>
                 </svg>
             </article>
             <article class="card">
                 <div class="card-heading"><div><h2 class="card-title">Learner Progress Distribution</h2><p class="card-subtitle">Current learner status</p></div></div>
                 <div class="donut-wrap">
-                    <svg class="donut" viewBox="0 0 120 120" aria-label="Progress distribution donut chart"><circle class="donut-track" cx="60" cy="60" r="52"/><circle class="donut-complete" cx="60" cy="60" r="52" style="stroke-dasharray:{{ $progress['completed'] * 3.27 }} 327"/><circle class="donut-progress" cx="60" cy="60" r="52" style="stroke-dasharray:{{ $progress['in_progress'] * 3.27 }} 327;stroke-dashoffset:-{{ $progress['completed'] * 3.27 }}"/></svg>
-                    <div class="donut-legend"><div class="legend-row"><i class="legend-dot"></i>Completed <strong>{{ $progress['completed'] }}%</strong></div><div class="legend-row"><i class="legend-dot yellow"></i>In Progress <strong>{{ $progress['in_progress'] }}%</strong></div><div class="legend-row"><i class="legend-dot gray"></i>Not Started <strong>{{ $progress['not_started'] }}%</strong></div></div>
+                    <svg class="donut" viewBox="0 0 120 120" aria-label="Progress distribution donut chart"><circle class="donut-track" cx="60" cy="60" r="52"/><circle class="donut-complete" cx="60" cy="60" r="52" style="stroke-dasharray:<?php echo e($progress['completed'] * 3.27); ?> 327"/><circle class="donut-progress" cx="60" cy="60" r="52" style="stroke-dasharray:<?php echo e($progress['in_progress'] * 3.27); ?> 327;stroke-dashoffset:-<?php echo e($progress['completed'] * 3.27); ?>"/></svg>
+                    <div class="donut-legend"><div class="legend-row"><i class="legend-dot"></i>Completed <strong><?php echo e($progress['completed']); ?>%</strong></div><div class="legend-row"><i class="legend-dot yellow"></i>In Progress <strong><?php echo e($progress['in_progress']); ?>%</strong></div><div class="legend-row"><i class="legend-dot gray"></i>Not Started <strong><?php echo e($progress['not_started']); ?>%</strong></div></div>
                 </div>
-                <div class="mini-stats"><div><div class="mini-label">Total Learners</div><div class="mini-value">{{ number_format($stats['total_students']) }}</div></div><div><div class="mini-label">Average Completion</div><div class="mini-value">{{ $stats['average_completion'] }}%</div></div></div>
+                <div class="mini-stats"><div><div class="mini-label">Total Learners</div><div class="mini-value"><?php echo e(number_format($stats['total_students'])); ?></div></div><div><div class="mini-label">Average Completion</div><div class="mini-value"><?php echo e($stats['average_completion']); ?>%</div></div></div>
             </article>
         </section>
 
@@ -217,38 +217,38 @@
             <article class="card table-card">
                 <div class="card-heading"><div><h2 class="card-title">Course Performance</h2><p class="card-subtitle">Completion rate and average score by course</p></div></div>
                 <table class="data-table"><thead><tr><th>Course</th><th>Enrolled</th><th>Completion</th><th>Avg. Score</th></tr></thead><tbody>
-                    @foreach ($coursePerformance as $course)
-                        <tr><td class="course-name">{{ $course->title }}</td><td>{{ $course->enrolled }}</td><td><div class="progress-cell"><div class="progress-track"><div class="progress-fill" style="width:{{ $course->completion }}%"></div></div><span>{{ $course->completion }}%</span></div></td><td class="score">{{ $course->score }}%</td></tr>
-                    @endforeach
+                    <?php $__currentLoopData = $coursePerformance; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <tr><td class="course-name"><?php echo e($course->title); ?></td><td><?php echo e($course->enrolled); ?></td><td><div class="progress-cell"><div class="progress-track"><div class="progress-fill" style="width:<?php echo e($course->completion); ?>%"></div></div><span><?php echo e($course->completion); ?>%</span></div></td><td class="score"><?php echo e($course->score); ?>%</td></tr>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </tbody></table>
             </article>
             <article class="card">
-                <div class="card-heading"><div><h2 class="card-title">Assessment Performance</h2><p class="card-subtitle">Average score by assessment type</p></div><div class="assessment-metric"><small>Overall Pass Rate</small><strong>{{ $assessment['pass_rate'] }}%</strong></div></div>
-                <div class="assessment-bar"><div class="assessment-bar-head"><span>Quizzes</span><strong>{{ $assessment['average'] }}%</strong></div><div class="progress-track"><div class="progress-fill" style="width:{{ $assessment['average'] }}%"></div></div></div>
-                <div class="metric-grid"><div class="metric-box"><strong>{{ number_format($assessment['total']) }}</strong><span>Total Assessments</span></div><div class="metric-box"><strong>{{ $assessment['highest'] }}%</strong><span>Highest Average</span></div><div class="metric-box"><strong>{{ $assessment['lowest'] }}%</strong><span>Lowest Average</span></div></div>
+                <div class="card-heading"><div><h2 class="card-title">Assessment Performance</h2><p class="card-subtitle">Average score by assessment type</p></div><div class="assessment-metric"><small>Overall Pass Rate</small><strong><?php echo e($assessment['pass_rate']); ?>%</strong></div></div>
+                <div class="assessment-bar"><div class="assessment-bar-head"><span>Quizzes</span><strong><?php echo e($assessment['average']); ?>%</strong></div><div class="progress-track"><div class="progress-fill" style="width:<?php echo e($assessment['average']); ?>%"></div></div></div>
+                <div class="metric-grid"><div class="metric-box"><strong><?php echo e(number_format($assessment['total'])); ?></strong><span>Total Assessments</span></div><div class="metric-box"><strong><?php echo e($assessment['highest']); ?>%</strong><span>Highest Average</span></div><div class="metric-box"><strong><?php echo e($assessment['lowest']); ?>%</strong><span>Lowest Average</span></div></div>
             </article>
         </section>
 
         <section class="dashboard-grid equal" aria-label="Competency and credential analytics">
             <article class="card">
                 <div class="card-heading"><div><h2 class="card-title">Competency Achievement</h2><p class="card-subtitle">Mastery rate by competency area</p></div></div>
-                <div class="competency-list">@foreach ($competencies as $competency)<div class="competency-row"><span>{{ $competency->name }}</span><div class="progress-track"><div class="progress-fill" style="width:{{ $competency->mastery }}%"></div></div><strong>{{ $competency->mastery }}%</strong></div>@endforeach</div>
-                <div class="card-footer"><span>Total Competencies: <strong>{{ $totalCompetencies }}</strong></span><span>Most Mastered: <strong>{{ optional($competencies->first())->name ?? 'No data' }} ({{ optional($competencies->first())->mastery ?? 0 }}%)</strong></span></div>
+                <div class="competency-list"><?php $__currentLoopData = $competencies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $competency): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><div class="competency-row"><span><?php echo e($competency->name); ?></span><div class="progress-track"><div class="progress-fill" style="width:<?php echo e($competency->mastery); ?>%"></div></div><strong><?php echo e($competency->mastery); ?>%</strong></div><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?></div>
+                <div class="card-footer"><span>Total Competencies: <strong><?php echo e($totalCompetencies); ?></strong></span><span>Most Mastered: <strong><?php echo e(optional($competencies->first())->name ?? 'No data'); ?> (<?php echo e(optional($competencies->first())->mastery ?? 0); ?>%)</strong></span></div>
             </article>
             <article class="card">
                 <div class="card-heading"><div><h2 class="card-title">Credential &amp; Badge Analytics</h2><p class="card-subtitle">Credential outcomes across the platform</p></div></div>
-                <div class="credential-grid"><div class="credential-metric"><strong>{{ number_format($credentialMetrics['certificates']) }}</strong><span>Certificates</span></div><div class="credential-metric"><strong>{{ number_format($credentialMetrics['badges']) }}</strong><span>Badges</span></div><div class="credential-metric"><strong>{{ number_format($credentialMetrics['verified']) }}</strong><span>Verified Credentials</span></div><div class="credential-metric"><strong>{{ number_format($credentialMetrics['pending']) }}</strong><span>Pending Review</span></div></div>
-                <div class="credential-heading">Credentials Issued Over Time</div><svg class="credential-chart" viewBox="0 0 760 230" preserveAspectRatio="none" aria-label="Credentials issued line chart"><path class="grid-line" d="M48 72H744M48 42H744"/><polygon class="chart-area" points="48,90 {{ $credentialActivity['points'] }} 744,90"/><polyline class="chart-line" points="{{ $credentialActivity['points'] }}"/></svg>
+                <div class="credential-grid"><div class="credential-metric"><strong><?php echo e(number_format($credentialMetrics['certificates'])); ?></strong><span>Certificates</span></div><div class="credential-metric"><strong><?php echo e(number_format($credentialMetrics['badges'])); ?></strong><span>Badges</span></div><div class="credential-metric"><strong><?php echo e(number_format($credentialMetrics['verified'])); ?></strong><span>Verified Credentials</span></div><div class="credential-metric"><strong><?php echo e(number_format($credentialMetrics['pending'])); ?></strong><span>Pending Review</span></div></div>
+                <div class="credential-heading">Credentials Issued Over Time</div><svg class="credential-chart" viewBox="0 0 760 230" preserveAspectRatio="none" aria-label="Credentials issued line chart"><path class="grid-line" d="M48 72H744M48 42H744"/><polygon class="chart-area" points="48,90 <?php echo e($credentialActivity['points']); ?> 744,90"/><polyline class="chart-line" points="<?php echo e($credentialActivity['points']); ?>"/></svg>
             </article>
         </section>
 
-        <section class="attention" aria-labelledby="attention-title"><div class="card-heading"><div><h2 class="card-title" id="attention-title">Requires Attention</h2><p class="card-subtitle">Areas that may need immediate focus</p></div></div><div class="attention-grid">@foreach ($attention as $index => $attentionCount)<div class="attention-item"><span class="warning-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3L2.5 20h19L12 3zM12 9v5m0 3h.01"/></svg></span><div><div class="attention-number">{{ $attentionCount }}</div><div class="attention-label">{{ ['Courses below 50% completion', 'Competencies below 40% mastery', 'Learners inactive for more than 14 days', 'Courses with assessment pass rates below 60%'][$index] }}</div></div></div>@endforeach</div></section>
+        <section class="attention" aria-labelledby="attention-title"><div class="card-heading"><div><h2 class="card-title" id="attention-title">Requires Attention</h2><p class="card-subtitle">Areas that may need immediate focus</p></div></div><div class="attention-grid"><?php $__currentLoopData = $attention; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $attentionCount): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><div class="attention-item"><span class="warning-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3L2.5 20h19L12 3zM12 9v5m0 3h.01"/></svg></span><div><div class="attention-number"><?php echo e($attentionCount); ?></div><div class="attention-label"><?php echo e(['Courses below 50% completion', 'Competencies below 40% mastery', 'Learners inactive for more than 14 days', 'Courses with assessment pass rates below 60%'][$index]); ?></div></div></div><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?></div></section>
     </div>
 
 </main>
-</div>{{-- /layout --}}
+</div>
 
-{{-- ── SCRIPTS ─────────────────────────────────────────────────────────── --}}
+
 <script>
     document.querySelectorAll('.activity-tab').forEach(function (button) {
         button.addEventListener('click', function () {
@@ -260,7 +260,7 @@
 </script>
 
 
-{{-- ── Back to top (appears on long pages) ── --}}
+
 <button id="back-to-top-btn" type="button" title="Back to top" aria-label="Back to top"
         onclick="window.scrollTo({top:0,behavior:'smooth'});">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
@@ -282,10 +282,10 @@
     })();
 </script>
 
-{{-- Shared Admin sidebar styling (floating card + section pills) --}}
-    @include('components.admin-sidebar')
+
+    <?php echo $__env->make('components.admin-sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     
-        {{-- Shared responsiveness layer (drawer nav + grid stacking) --}}
-    @include('components.responsive')
+        
+    <?php echo $__env->make('components.responsive', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
-</html>
+</html><?php /**PATH C:\Users\PaulV\Documents\MICROCREDENTIALS NEW ADDITIONS\UPSKILL - Microcredential Platform\resources\views/admin/analytics-report.blade.php ENDPATH**/ ?>

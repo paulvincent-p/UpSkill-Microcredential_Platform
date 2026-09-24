@@ -1,20 +1,12 @@
-{{--
-    resources/views/admin/show.blade.php
 
-    Admin › Courses & Badges › Course Detail
-    URL: /Admin-courses/{id}   (admin.courses.show)
-
-    Expected data from AdminController::showCourse():
-        'course', 'modules', 'enrollments' (same fields as before)
---}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $course->title }} – Courses &amp; Badges</title>
-    <link rel="icon" type="image/png" href="{{ asset('images/PSU-Logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('images/PSU-Logo.png') }}">
+    <title><?php echo e($course->title); ?> – Courses &amp; Badges</title>
+    <link rel="icon" type="image/png" href="<?php echo e(asset('images/PSU-Logo.png')); ?>">
+    <link rel="apple-touch-icon" href="<?php echo e(asset('images/PSU-Logo.png')); ?>">
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -204,283 +196,292 @@
     </style>
 </head>
 <body>
-@include('components.authenticated-topbar', ['user' => auth()->user()])
+<?php echo $__env->make('components.authenticated-topbar', ['user' => auth()->user()], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
 <div class="layout admin-layout">
 
-    {{-- SHARED ADMIN SIDEBAR --}}
-    @include('components.admin-sidebar')
+    
+    <?php echo $__env->make('components.admin-sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-    {{-- MAIN CONTENT --}}
+    
     <main class="main">
     <div class="page-wrap">
 
-        <a href="{{ route('admin.courses') }}" class="back-link">
+        <a href="<?php echo e(route('admin.courses')); ?>" class="back-link">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
             Back to courses and badges
         </a>
 
-        @if (session('success'))
-            <div class="alert-success">{{ session('success') }}</div>
-        @endif
+        <?php if(session('success')): ?>
+            <div class="alert-success"><?php echo e(session('success')); ?></div>
+        <?php endif; ?>
 
-        @if (! empty($course->change_note))
-            <div class="banner banner-note"><strong>What the author changed</strong>{{ $course->change_note }}</div>
-        @endif
+        <?php if(! empty($course->change_note)): ?>
+            <div class="banner banner-note"><strong>What the author changed</strong><?php echo e($course->change_note); ?></div>
+        <?php endif; ?>
 
-        @if (! empty($course->denial_feedback))
-            <div class="banner banner-denied"><strong>Previous denial feedback</strong>{{ $course->denial_feedback }}</div>
-        @endif
+        <?php if(! empty($course->denial_feedback)): ?>
+            <div class="banner banner-denied"><strong>Previous denial feedback</strong><?php echo e($course->denial_feedback); ?></div>
+        <?php endif; ?>
 
-        {{-- Header --}}
+        
         <div class="card">
             <div class="head-top">
                 <div>
-                    <div class="detail-title">{{ $course->title }}</div>
+                    <div class="detail-title"><?php echo e($course->title); ?></div>
                     <div class="detail-sub">
-                        By {{ $course->instructor ?? 'Faculty' }}
-                        @if ($course->category) · {{ $course->category }} @endif
-                        @if ($course->created_at) · Created {{ $course->created_at->format('M j, Y') }} @endif
+                        By <?php echo e($course->instructor ?? 'Faculty'); ?>
+
+                        <?php if($course->category): ?> · <?php echo e($course->category); ?> <?php endif; ?>
+                        <?php if($course->created_at): ?> · Created <?php echo e($course->created_at->format('M j, Y')); ?> <?php endif; ?>
                     </div>
                 </div>
-                <span class="status-pill status-{{ $course->status_key }}">
-                    <span class="dot"></span>{{ $course->status }}
+                <span class="status-pill status-<?php echo e($course->status_key); ?>">
+                    <span class="dot"></span><?php echo e($course->status); ?>
+
                 </span>
             </div>
 
             <div class="detail-actions">
-                @if ($course->status_key === 'pending')
-                    <form method="POST" action="{{ route('admin.courses.approve', $course->id) }}">
-                        @csrf
+                <?php if($course->status_key === 'pending'): ?>
+                    <form method="POST" action="<?php echo e(route('admin.courses.approve', $course->id)); ?>">
+                        <?php echo csrf_field(); ?>
                         <button type="submit" class="btn btn-approve">Approve</button>
                     </form>
                     <button type="button" class="btn" id="deny-open">Deny with feedback</button>
-                @endif
+                <?php endif; ?>
 
-                <form method="POST" action="{{ route('admin.courses.destroy', $course->id) }}" style="margin-left:auto;">
-                    @csrf
+                <form method="POST" action="<?php echo e(route('admin.courses.destroy', $course->id)); ?>" style="margin-left:auto;">
+                    <?php echo csrf_field(); ?>
                     <button type="submit" class="btn btn-delete"
-                            onclick="return confirm('Permanently delete \'{{ addslashes($course->title) }}\'? Its modules, lessons, quizzes and enrollments will also be removed. This cannot be undone.');">
+                            onclick="return confirm('Permanently delete \'<?php echo e(addslashes($course->title)); ?>\'? Its modules, lessons, quizzes and enrollments will also be removed. This cannot be undone.');">
                         Delete course
                     </button>
                 </form>
             </div>
 
-            @if ($course->status_key === 'pending')
-                <div id="deny-panel" class="{{ $errors->has('denial_feedback') ? 'open' : '' }}" style="margin-top:14px;">
-                    <form method="POST" action="{{ route('admin.courses.deny', $course->id) }}">
-                        @csrf
+            <?php if($course->status_key === 'pending'): ?>
+                <div id="deny-panel" class="<?php echo e($errors->has('denial_feedback') ? 'open' : ''); ?>" style="margin-top:14px;">
+                    <form method="POST" action="<?php echo e(route('admin.courses.deny', $course->id)); ?>">
+                        <?php echo csrf_field(); ?>
                         <label for="denial_feedback">Feedback for the author (required)</label>
                         <textarea id="denial_feedback" name="denial_feedback" required minlength="5"
-                                  placeholder="Explain what needs to change before this course can be approved.">{{ old('denial_feedback') }}</textarea>
-                        @error('denial_feedback')
-                            <div class="field-error">{{ $message }}</div>
-                        @enderror
+                                  placeholder="Explain what needs to change before this course can be approved."><?php echo e(old('denial_feedback')); ?></textarea>
+                        <?php $__errorArgs = ['denial_feedback'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <div class="field-error"><?php echo e($message); ?></div>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         <div class="deny-actions">
                             <button type="submit" class="btn btn-approve">Send denial and feedback</button>
                             <button type="button" class="btn btn-ghost" id="deny-cancel">Cancel</button>
                         </div>
                     </form>
                 </div>
-            @endif
+            <?php endif; ?>
         </div>
 
-        {{-- Quick facts --}}
+        
         <div class="card stats">
-            <div><small>Level</small><b>{{ $course->level ?? '—' }}</b></div>
-            <div><small>Duration</small><b>{{ $course->duration ?? '—' }}</b></div>
-            <div><small>Program</small><b>{{ $course->program ?? '—' }}</b></div>
-            <div><small>Term</small><b>{{ $course->term ?? '—' }}</b></div>
-            <div><small>Students</small><b>{{ $course->students }}</b></div>
-            <div><small>Modules</small><b>{{ $course->modules_count }}</b></div>
-            <div><small>Lessons</small><b>{{ $course->lessons_count }}</b></div>
+            <div><small>Level</small><b><?php echo e($course->level ?? '—'); ?></b></div>
+            <div><small>Duration</small><b><?php echo e($course->duration ?? '—'); ?></b></div>
+            <div><small>Program</small><b><?php echo e($course->program ?? '—'); ?></b></div>
+            <div><small>Term</small><b><?php echo e($course->term ?? '—'); ?></b></div>
+            <div><small>Students</small><b><?php echo e($course->students); ?></b></div>
+            <div><small>Modules</small><b><?php echo e($course->modules_count); ?></b></div>
+            <div><small>Lessons</small><b><?php echo e($course->lessons_count); ?></b></div>
         </div>
 
         <div class="cols">
 
-            {{-- LEFT: what to review --}}
+            
             <div class="stack">
 
                 <div class="card">
                     <h3>Description</h3>
-                    <p>{!! $course->description ?: 'No description provided.' !!}</p>
+                    <p><?php echo $course->description ?: 'No description provided.'; ?></p>
                 </div>
 
-                @if (! empty($course->skills) || ! empty($course->related_skills))
+                <?php if(! empty($course->skills) || ! empty($course->related_skills)): ?>
                 <div class="card">
-                    @if (! empty($course->skills))
+                    <?php if(! empty($course->skills)): ?>
                         <h3>Skills covered</h3>
                         <div class="chip-row">
-                            @foreach ($course->skills as $skill)
-                                <span class="chip">{{ $skill }}</span>
-                            @endforeach
+                            <?php $__currentLoopData = $course->skills; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $skill): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <span class="chip"><?php echo e($skill); ?></span>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
-                    @endif
+                    <?php endif; ?>
 
-                    {{-- "Subject is Related on": internal only --}}
-                    @if (! empty($course->related_skills))
-                        <h3 class="{{ ! empty($course->skills) ? 'subhead' : '' }}">
+                    
+                    <?php if(! empty($course->related_skills)): ?>
+                        <h3 class="<?php echo e(! empty($course->skills) ? 'subhead' : ''); ?>">
                             Related on
                             <small>Set by faculty and used to recommend this course. Not shown on any student page.</small>
                         </h3>
                         <div class="chip-row">
-                            @foreach ($course->related_skills as $skill)
-                                <span class="chip">{{ $skill }}</span>
-                            @endforeach
+                            <?php $__currentLoopData = $course->related_skills; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $skill): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <span class="chip"><?php echo e($skill); ?></span>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
-                    @endif
+                    <?php endif; ?>
                 </div>
-                @endif
+                <?php endif; ?>
 
-                @if (! empty($course->objectives))
+                <?php if(! empty($course->objectives)): ?>
                 <div class="card">
                     <h3>Learning objectives</h3>
                     <ul class="obj-list">
-                        @foreach ($course->objectives as $objective)
-                            <li>{{ $objective }}</li>
-                        @endforeach
+                        <?php $__currentLoopData = $course->objectives; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $objective): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <li><?php echo e($objective); ?></li>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </ul>
                 </div>
-                @endif
+                <?php endif; ?>
 
                 <div class="card">
                     <h3>Course content</h3>
-                    @forelse ($modules as $module)
+                    <?php $__empty_1 = true; $__currentLoopData = $modules; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $module): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                         <div class="module-block">
-                            <div class="module-title">{{ $module->title }}</div>
-                            @if ($module->description)
-                                <div class="module-sub">{!! $module->description !!}</div>
-                            @endif
+                            <div class="module-title"><?php echo e($module->title); ?></div>
+                            <?php if($module->description): ?>
+                                <div class="module-sub"><?php echo $module->description; ?></div>
+                            <?php endif; ?>
 
-                            @foreach ($module->lessons as $lesson)
+                            <?php $__currentLoopData = $module->lessons; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $lesson): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <div class="lesson-row" onclick="this.nextElementSibling.classList.toggle('open')">
-                                    <span>{{ $lesson->title }}</span>
-                                    <span class="lesson-meta">{{ $lesson->type }}{{ $lesson->duration ? ' · ' . $lesson->duration : '' }}</span>
+                                    <span><?php echo e($lesson->title); ?></span>
+                                    <span class="lesson-meta"><?php echo e($lesson->type); ?><?php echo e($lesson->duration ? ' · ' . $lesson->duration : ''); ?></span>
                                 </div>
                                 <div class="lesson-detail">
-                                    @if ($lesson->description)
-                                        <p class="lesson-desc">{{ $lesson->description }}</p>
-                                    @endif
-                                    @if ($lesson->file_url)
-                                        <a class="lesson-file" href="{{ $lesson->file_url }}" target="_blank" rel="noopener">Open attached file ({{ $lesson->file_name }})</a>
-                                    @elseif (! $lesson->description)
+                                    <?php if($lesson->description): ?>
+                                        <p class="lesson-desc"><?php echo e($lesson->description); ?></p>
+                                    <?php endif; ?>
+                                    <?php if($lesson->file_url): ?>
+                                        <a class="lesson-file" href="<?php echo e($lesson->file_url); ?>" target="_blank" rel="noopener">Open attached file (<?php echo e($lesson->file_name); ?>)</a>
+                                    <?php elseif(! $lesson->description): ?>
                                         <p class="lesson-desc lesson-empty">No description or file attached.</p>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-                            @if ($module->quiz)
+                            <?php if($module->quiz): ?>
                                 <div class="quiz-row" onclick="this.nextElementSibling.classList.toggle('open')">
-                                    <span>Quiz: {{ $module->quiz->title }}</span>
-                                    <span>{{ $module->quiz->questions_count }} questions · Pass {{ $module->quiz->passing_score }}%{{ $module->quiz->time_limit ? ' · ' . $module->quiz->time_limit . ' min' : '' }}</span>
+                                    <span>Quiz: <?php echo e($module->quiz->title); ?></span>
+                                    <span><?php echo e($module->quiz->questions_count); ?> questions · Pass <?php echo e($module->quiz->passing_score); ?>%<?php echo e($module->quiz->time_limit ? ' · ' . $module->quiz->time_limit . ' min' : ''); ?></span>
                                 </div>
                                 <div class="quiz-detail">
-                                    @if ($module->quiz->instructions)
-                                        <p class="quiz-instructions">{{ $module->quiz->instructions }}</p>
-                                    @endif
-                                    @foreach ($module->quiz->questions as $qi => $q)
+                                    <?php if($module->quiz->instructions): ?>
+                                        <p class="quiz-instructions"><?php echo e($module->quiz->instructions); ?></p>
+                                    <?php endif; ?>
+                                    <?php $__currentLoopData = $module->quiz->questions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $qi => $q): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <div class="quiz-question">
                                             <div class="quiz-question-head">
-                                                <span class="quiz-question-text">Q{{ $qi + 1 }}. {{ $q->question }}</span>
-                                                <span class="quiz-question-meta">{{ $q->type }}{{ $q->points ? ' · ' . $q->points . ' pts' : '' }}</span>
+                                                <span class="quiz-question-text">Q<?php echo e($qi + 1); ?>. <?php echo e($q->question); ?></span>
+                                                <span class="quiz-question-meta"><?php echo e($q->type); ?><?php echo e($q->points ? ' · ' . $q->points . ' pts' : ''); ?></span>
                                             </div>
-                                            @if (! empty($q->options))
+                                            <?php if(! empty($q->options)): ?>
                                                 <ul class="quiz-options">
-                                                    @foreach ($q->options as $oi => $opt)
-                                                        <li class="{{ $opt === $q->correct_answer ? 'is-correct' : '' }}">
-                                                            {{ chr(65 + $oi) }}. {{ $opt }}@if ($opt === $q->correct_answer) (correct) @endif
+                                                    <?php $__currentLoopData = $q->options; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $oi => $opt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                        <li class="<?php echo e($opt === $q->correct_answer ? 'is-correct' : ''); ?>">
+                                                            <?php echo e(chr(65 + $oi)); ?>. <?php echo e($opt); ?><?php if($opt === $q->correct_answer): ?> (correct) <?php endif; ?>
                                                         </li>
-                                                    @endforeach
+                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                 </ul>
-                                            @elseif ($q->correct_answer)
-                                                <div class="quiz-answer">Answer: <strong>{{ $q->correct_answer }}</strong></div>
-                                            @endif
+                                            <?php elseif($q->correct_answer): ?>
+                                                <div class="quiz-answer">Answer: <strong><?php echo e($q->correct_answer); ?></strong></div>
+                                            <?php endif; ?>
                                         </div>
-                                    @endforeach
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </div>
-                            @endif
+                            <?php endif; ?>
                         </div>
-                    @empty
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <div class="modules-empty">No modules have been added to this course yet.</div>
-                    @endforelse
+                    <?php endif; ?>
                 </div>
             </div>
 
-            {{-- RIGHT: award + progress --}}
+            
             <div class="stack">
 
                 <div class="card">
                     <h3>Completion award</h3>
 
-                    @if ($course->badge_icon)
-                        <img class="award-badge" src="{{ $course->badge_icon }}" alt="{{ $course->badge }}">
-                    @else
+                    <?php if($course->badge_icon): ?>
+                        <img class="award-badge" src="<?php echo e($course->badge_icon); ?>" alt="<?php echo e($course->badge); ?>">
+                    <?php else: ?>
                         <div class="award-none">No badge designed yet</div>
-                    @endif
-                    <div class="award-name">{{ $course->badge }}</div>
-                    @if ($course->badge_level)
-                        <div class="award-sub">{{ $course->badge_level }}</div>
-                    @endif
+                    <?php endif; ?>
+                    <div class="award-name"><?php echo e($course->badge); ?></div>
+                    <?php if($course->badge_level): ?>
+                        <div class="award-sub"><?php echo e($course->badge_level); ?></div>
+                    <?php endif; ?>
 
                     <div class="award-label">
                         Certificate
-                        @if ($course->certificate_enabled)
-                            <span class="award-tag">{{ $course->certificate_mode === 'upload' ? 'Uploaded' : 'Auto-generated' }}</span>
-                        @endif
+                        <?php if($course->certificate_enabled): ?>
+                            <span class="award-tag"><?php echo e($course->certificate_mode === 'upload' ? 'Uploaded' : 'Auto-generated'); ?></span>
+                        <?php endif; ?>
                     </div>
 
-                    @if (! $course->certificate_enabled)
+                    <?php if(! $course->certificate_enabled): ?>
                         <div class="award-none">No certificate configured yet</div>
-                    @elseif ($course->certificate_mode === 'upload' && $course->certificate_file)
-                        @php $ext = strtolower(pathinfo($course->certificate_file, PATHINFO_EXTENSION)); @endphp
+                    <?php elseif($course->certificate_mode === 'upload' && $course->certificate_file): ?>
+                        <?php $ext = strtolower(pathinfo($course->certificate_file, PATHINFO_EXTENSION)); ?>
                         <div class="award-upload">
-                            @if ($ext === 'pdf')
-                                <embed src="{{ asset($course->certificate_file) }}" type="application/pdf">
-                            @else
-                                <img src="{{ asset($course->certificate_file) }}" alt="Uploaded certificate">
-                            @endif
+                            <?php if($ext === 'pdf'): ?>
+                                <embed src="<?php echo e(asset($course->certificate_file)); ?>" type="application/pdf">
+                            <?php else: ?>
+                                <img src="<?php echo e(asset($course->certificate_file)); ?>" alt="Uploaded certificate">
+                            <?php endif; ?>
                         </div>
-                        <a class="award-link" href="{{ asset($course->certificate_file) }}" target="_blank">Open the uploaded file</a>
-                    @else
+                        <a class="award-link" href="<?php echo e(asset($course->certificate_file)); ?>" target="_blank">Open the uploaded file</a>
+                    <?php else: ?>
                         <div class="cert-wrap">
-                            @include('components.certificate', ['cert' => $course->certificate])
+                            <?php echo $__env->make('components.certificate', ['cert' => $course->certificate], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
                         </div>
-                    @endif
+                    <?php endif; ?>
                 </div>
 
                 <div class="card">
                     <h3>Completion</h3>
-                    <div class="progress-track"><div class="progress-fill" style="width: {{ $course->percent }}%"></div></div>
-                    <div class="pct">{{ $course->percent }}% average completion · {{ $course->students }} enrolled</div>
+                    <div class="progress-track"><div class="progress-fill" style="width: <?php echo e($course->percent); ?>%"></div></div>
+                    <div class="pct"><?php echo e($course->percent); ?>% average completion · <?php echo e($course->students); ?> enrolled</div>
                 </div>
             </div>
         </div>
 
-        {{-- Enrollment review (institutional completion, Phase 3 Step 11).
-             Confirm / Reject only shows when an enrollment awaits academic-unit confirmation. --}}
+        
         <div class="card" style="margin-top:16px;">
             <h3>Enrollment review</h3>
-            @forelse ($enrollments as $enrollment)
+            <?php $__empty_1 = true; $__currentLoopData = $enrollments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $enrollment): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                 <div class="enroll-row">
                     <div class="enroll-name">
-                        {{ $enrollment->student_name }}
-                        <small>{{ $enrollment->institutional_label }}</small>
+                        <?php echo e($enrollment->student_name); ?>
+
+                        <small><?php echo e($enrollment->institutional_label); ?></small>
                     </div>
-                    <div class="enroll-cell"><small>Completion</small>{{ ucfirst(str_replace('_', ' ', $enrollment->completion_status)) }}</div>
-                    <div class="enroll-cell"><small>Faculty verification</small>{{ ucfirst(str_replace('_', ' ', $enrollment->faculty_verification_status)) }}</div>
-                    <div class="enroll-cell"><small>Academic unit</small>{{ ucfirst(str_replace('_', ' ', $enrollment->academic_unit_confirmation_status)) }}</div>
-                    <div class="enroll-cell"><small>Completed</small>{{ $enrollment->completed_at?->format('M j, Y') ?? '—' }}</div>
-                    @if ($enrollment->academic_confirmation_actionable)
-                        <form method="POST" action="{{ route('admin.enrollments.academic-confirm', ['id' => $course->id, 'enrollment' => $enrollment->id]) }}" class="enroll-actions" style="grid-column:1/-1;">
-                            @csrf
+                    <div class="enroll-cell"><small>Completion</small><?php echo e(ucfirst(str_replace('_', ' ', $enrollment->completion_status))); ?></div>
+                    <div class="enroll-cell"><small>Faculty verification</small><?php echo e(ucfirst(str_replace('_', ' ', $enrollment->faculty_verification_status))); ?></div>
+                    <div class="enroll-cell"><small>Academic unit</small><?php echo e(ucfirst(str_replace('_', ' ', $enrollment->academic_unit_confirmation_status))); ?></div>
+                    <div class="enroll-cell"><small>Completed</small><?php echo e($enrollment->completed_at?->format('M j, Y') ?? '—'); ?></div>
+                    <?php if($enrollment->academic_confirmation_actionable): ?>
+                        <form method="POST" action="<?php echo e(route('admin.enrollments.academic-confirm', ['id' => $course->id, 'enrollment' => $enrollment->id])); ?>" class="enroll-actions" style="grid-column:1/-1;">
+                            <?php echo csrf_field(); ?>
                             <button type="submit" name="decision" value="confirmed" class="btn btn-approve">Confirm</button>
                             <button type="submit" name="decision" value="rejected" class="btn">Reject</button>
                         </form>
-                    @endif
+                    <?php endif; ?>
                 </div>
-            @empty
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <div class="modules-empty">No enrollments for this course yet.</div>
-            @endforelse
+            <?php endif; ?>
         </div>
 
     </div>
@@ -503,7 +504,7 @@
     })();
 </script>
 
-{{-- Back to top --}}
+
 <button id="back-to-top-btn" type="button" title="Back to top" aria-label="Back to top"
         onclick="window.scrollTo({top:0,behavior:'smooth'});">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
@@ -523,6 +524,6 @@
     })();
 </script>
 
-@include('components.responsive')
+<?php echo $__env->make('components.responsive', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
-</html>
+</html><?php /**PATH C:\Users\PaulV\Documents\MICROCREDENTIALS NEW ADDITIONS\UPSKILL - Microcredential Platform\resources\views/admin/courses/show.blade.php ENDPATH**/ ?>

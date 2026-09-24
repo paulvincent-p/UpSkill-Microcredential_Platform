@@ -1,17 +1,13 @@
-{{--
-    resources/views/admin/Complaints.blade.php
-    Admin › Complaint Inbox — Help Center messages raised by students.
-    Expects: $threads, $selected (Complaint|null), $unreadCount.
---}}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Complaint Inbox | UPSKILL Admin</title>
-    {{-- Browser tab icon (favicon) --}}
-    <link rel="icon" type="image/png" href="{{ asset('images/PSU-Logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('images/PSU-Logo.png') }}">
+    
+    <link rel="icon" type="image/png" href="<?php echo e(asset('images/PSU-Logo.png')); ?>">
+    <link rel="apple-touch-icon" href="<?php echo e(asset('images/PSU-Logo.png')); ?>">
 <style>
     :root{--navy:#13176b;--gold:#dba617;--muted:#6b7280;--line:#e5e7eb;--green:#15803d;
           --red:#ef4444;--shadow:0 10px 25px rgba(19,23,107,.08);--topbar-h:60px;}
@@ -111,55 +107,62 @@
 </style>
 </head>
 <body>
-@include('components.authenticated-topbar', ['user' => auth()->user()])
+<?php echo $__env->make('components.authenticated-topbar', ['user' => auth()->user()], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 <style>.topbar{display:none!important;}.wrap{margin-top:0!important;}</style>
-@if(false)
+<?php if(false): ?>
 <nav class="topbar" hidden aria-hidden="true">
-    <a href="{{ route('admin.dashboard') }}" class="topbar-brand">
-        <span class="brand-logo"><img src="{{ asset('images/PSU-Logo.png') }}" alt="PSU Logo"></span>
+    <a href="<?php echo e(route('admin.dashboard')); ?>" class="topbar-brand">
+        <span class="brand-logo"><img src="<?php echo e(asset('images/PSU-Logo.png')); ?>" alt="PSU Logo"></span>
         UPSKILL
     </a>
     <div class="topbar-right">
-        <a href="{{ route('notifications.index') }}" class="avatar-btn" title="Notifications">
+        <a href="<?php echo e(route('notifications.index')); ?>" class="avatar-btn" title="Notifications">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                 <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>
             </svg>
         </a>
-        <a href="{{ route('admin.profile') }}" class="avatar-btn" title="My Profile"
-           @if(auth()->user()?->avatar_url)
-               style="background-image:url('{{ auth()->user()->avatar_url }}');background-size:cover;background-position:center;overflow:hidden;"
-           @endif>
-            @unless(auth()->user()?->avatar_url)
+        <a href="<?php echo e(route('admin.profile')); ?>" class="avatar-btn" title="My Profile"
+           <?php if(auth()->user()?->avatar_url): ?>
+               style="background-image:url('<?php echo e(auth()->user()->avatar_url); ?>');background-size:cover;background-position:center;overflow:hidden;"
+           <?php endif; ?>>
+            <?php if (! (auth()->user()?->avatar_url)): ?>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8V21.6h19.2V19.2c0-3.2-6.4-4.8-9.6-4.8z"/>
             </svg>
-            @endunless
+            <?php endif; ?>
         </a>
-        <form action="{{ route('logout') }}" method="POST" style="display:inline-flex;">
-            @csrf
+        <form action="<?php echo e(route('logout')); ?>" method="POST" style="display:inline-flex;">
+            <?php echo csrf_field(); ?>
             <button type="submit" class="btn-danger">Logout</button>
         </form>
     </div>
 </nav>
-@endif
+<?php endif; ?>
 
 <div class="wrap">
     <h1 class="page-heading">Complaint Inbox</h1>
     <p class="page-sub">Messages sent by students through the Help Center. Reply and they will see it in their inbox.</p>
 
-    @if (session('success'))
-        <div class="alert">{{ session('success') }}</div>
-    @endif
+    <?php if(session('success')): ?>
+        <div class="alert"><?php echo e(session('success')); ?></div>
+    <?php endif; ?>
 
-    {{-- Delivery failed: the reply is safely stored, but nothing was sent. --}}
-    @error('mail')
-        <div class="alert alert-warn">{{ $message }}</div>
-    @enderror
+    
+    <?php $__errorArgs = ['mail'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+        <div class="alert alert-warn"><?php echo e($message); ?></div>
+    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
 
     <div class="grid">
-        {{-- ── Thread list ── --}}
+        
         <div>
-            <a href="{{ route('admin.dashboard') }}" class="btn-home">
+            <a href="<?php echo e(route('admin.dashboard')); ?>" class="btn-home">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                     <path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.8V20h14V9.8"/>
                 </svg>
@@ -169,131 +172,138 @@
             <div class="panel">
             <div class="panel-hd">
                 <span>Complaints</span>
-                @if ($unreadCount > 0)<span class="count-pill">{{ $unreadCount }} new</span>@endif
+                <?php if($unreadCount > 0): ?><span class="count-pill"><?php echo e($unreadCount); ?> new</span><?php endif; ?>
             </div>
 
-            @forelse ($threads as $t)
-                <a class="thread {{ $selected && $selected->id === $t->id ? 'active' : '' }}"
-                   href="{{ route('admin.complaints', ['thread' => $t->id]) }}">
+            <?php $__empty_1 = true; $__currentLoopData = $threads; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                <a class="thread <?php echo e($selected && $selected->id === $t->id ? 'active' : ''); ?>"
+                   href="<?php echo e(route('admin.complaints', ['thread' => $t->id])); ?>">
                     <div class="thread-top">
-                        <span class="thread-subject">{{ $t->subject }}</span>
-                        @if ($t->unreadForAdmin())<span class="dot"></span>@endif
+                        <span class="thread-subject"><?php echo e($t->subject); ?></span>
+                        <?php if($t->unreadForAdmin()): ?><span class="dot"></span><?php endif; ?>
                     </div>
-                    {{-- Badges on their own line, then the sender and time.
-                         Mixing all four inline made them wrap mid-row. --}}
+                    
                     <div class="thread-badges">
-                        <span class="origin {{ $t->isFromVisitor() ? 'visitor' : 'student' }}">
-                            {{ $t->isFromVisitor() ? 'Visitor' : 'Student' }}
+                        <span class="origin <?php echo e($t->isFromVisitor() ? 'visitor' : 'student'); ?>">
+                            <?php echo e($t->isFromVisitor() ? 'Visitor' : 'Student'); ?>
+
                         </span>
-                        <span class="status {{ $t->status }}">{{ ucfirst($t->status) }}</span>
-                        @if ($t->attachment_url)
+                        <span class="status <?php echo e($t->status); ?>"><?php echo e(ucfirst($t->status)); ?></span>
+                        <?php if($t->attachment_url): ?>
                             <span class="clip" title="Has an attachment">📎</span>
-                        @endif
+                        <?php endif; ?>
                     </div>
                     <div class="thread-meta">
-                        <span class="thread-who">{{ $t->senderName() }}</span>
+                        <span class="thread-who"><?php echo e($t->senderName()); ?></span>
                         <span class="thread-dot">·</span>
-                        <span>{{ $t->lastActivityAt()?->diffForHumans() }}</span>
+                        <span><?php echo e($t->lastActivityAt()?->diffForHumans()); ?></span>
                     </div>
                 </a>
-            @empty
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <div class="empty">No complaints yet.</div>
-            @endforelse
+            <?php endif; ?>
             </div>
         </div>
 
-        {{-- ── Selected thread ── --}}
+        
         <div class="panel">
-            @if ($selected)
+            <?php if($selected): ?>
                 <div class="detail-hd">
-                    <h2>{{ $selected->subject }}</h2>
+                    <h2><?php echo e($selected->subject); ?></h2>
                     <div class="who">
-                        <span class="origin {{ $selected->isFromVisitor() ? 'visitor' : 'student' }}">
-                            {{ $selected->isFromVisitor() ? 'Website Visitor' : 'Student' }}
+                        <span class="origin <?php echo e($selected->isFromVisitor() ? 'visitor' : 'student'); ?>">
+                            <?php echo e($selected->isFromVisitor() ? 'Website Visitor' : 'Student'); ?>
+
                         </span>
-                        From {{ $selected->senderName() }}
-                        @if ($selected->isFromVisitor())
-                            @if ($selected->guest_email)
-                                (<a href="mailto:{{ $selected->guest_email }}"
-                                    style="text-decoration:underline;">{{ $selected->guest_email }}</a>)
-                            @endif
-                        @else
-                            ({{ $selected->user->user_code ?? '—' }})
-                        @endif
-                        · {{ $selected->created_at?->format('M j, Y g:i A') }}
+                        From <?php echo e($selected->senderName()); ?>
+
+                        <?php if($selected->isFromVisitor()): ?>
+                            <?php if($selected->guest_email): ?>
+                                (<a href="mailto:<?php echo e($selected->guest_email); ?>"
+                                    style="text-decoration:underline;"><?php echo e($selected->guest_email); ?></a>)
+                            <?php endif; ?>
+                        <?php else: ?>
+                            (<?php echo e($selected->user->user_code ?? '—'); ?>)
+                        <?php endif; ?>
+                        · <?php echo e($selected->created_at?->format('M j, Y g:i A')); ?>
+
                     </div>
                 </div>
 
                 <div class="msgs">
-                    {{-- Opening message --}}
+                    
                     <div class="msg from-student">
                         <div>
-                            <div class="msg-who">{{ $selected->senderName() }}</div>
-                            <div class="bubble">{{ $selected->message }}</div>
+                            <div class="msg-who"><?php echo e($selected->senderName()); ?></div>
+                            <div class="bubble"><?php echo e($selected->message); ?></div>
 
-                            @if ($selected->attachment_url)
+                            <?php if($selected->attachment_url): ?>
                                 <div class="attach">
-                                    @if ($selected->attachmentIsImage())
-                                        {{-- Click to open full size --}}
-                                        <img src="{{ asset($selected->attachment_url) }}"
-                                             alt="{{ $selected->attachment_name }}"
+                                    <?php if($selected->attachmentIsImage()): ?>
+                                        
+                                        <img src="<?php echo e(asset($selected->attachment_url)); ?>"
+                                             alt="<?php echo e($selected->attachment_name); ?>"
                                              onclick="openLightbox(this.src)">
-                                    @else
+                                    <?php else: ?>
                                         <a class="attach-file" target="_blank"
-                                           href="{{ asset($selected->attachment_url) }}">
-                                            📎 {{ $selected->attachment_name ?? 'Attachment' }}
+                                           href="<?php echo e(asset($selected->attachment_url)); ?>">
+                                            📎 <?php echo e($selected->attachment_name ?? 'Attachment'); ?>
+
                                         </a>
-                                    @endif
-                                    <div class="attach-name">{{ $selected->attachment_name }}</div>
+                                    <?php endif; ?>
+                                    <div class="attach-name"><?php echo e($selected->attachment_name); ?></div>
                                 </div>
-                            @endif
+                            <?php endif; ?>
                         </div>
                     </div>
 
-                    @foreach ($selected->replies as $reply)
-                        <div class="msg {{ $reply->is_admin ? 'from-admin' : 'from-student' }}">
+                    <?php $__currentLoopData = $selected->replies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $reply): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <div class="msg <?php echo e($reply->is_admin ? 'from-admin' : 'from-student'); ?>">
                             <div>
-                                <div class="msg-who" style="{{ $reply->is_admin ? 'text-align:right;' : '' }}">
-                                    {{ $reply->is_admin ? 'Administrator' : ($reply->author->name ?? 'Student') }}
-                                    · {{ $reply->created_at?->diffForHumans() }}
+                                <div class="msg-who" style="<?php echo e($reply->is_admin ? 'text-align:right;' : ''); ?>">
+                                    <?php echo e($reply->is_admin ? 'Administrator' : ($reply->author->name ?? 'Student')); ?>
+
+                                    · <?php echo e($reply->created_at?->diffForHumans()); ?>
+
                                 </div>
-                                <div class="bubble">{{ $reply->body }}</div>
+                                <div class="bubble"><?php echo e($reply->body); ?></div>
                             </div>
                         </div>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
 
                 <div class="reply-box">
-                    <form method="POST" action="{{ route('admin.complaints.reply', $selected->id) }}">
-                        @csrf
+                    <form method="POST" action="<?php echo e(route('admin.complaints.reply', $selected->id)); ?>">
+                        <?php echo csrf_field(); ?>
                         <textarea name="body"
-                            placeholder="{{ $selected->isFromVisitor() ? 'Write your reply — it will be emailed to them…' : 'Write your reply to the student…' }}"
+                            placeholder="<?php echo e($selected->isFromVisitor() ? 'Write your reply — it will be emailed to them…' : 'Write your reply to the student…'); ?>"
                             required></textarea>
                         <div class="reply-actions">
                             <button type="submit" class="btn-navy">Send Reply</button>
                         </div>
-                        @if ($selected->isFromVisitor() && $selected->guest_email)
+                        <?php if($selected->isFromVisitor() && $selected->guest_email): ?>
                             <div class="mail-note">
-                                ✉ This reply will be emailed to {{ $selected->guest_email }}.
+                                ✉ This reply will be emailed to <?php echo e($selected->guest_email); ?>.
                             </div>
-                        @endif
+                        <?php endif; ?>
                     </form>
-                    <form method="POST" action="{{ route('admin.complaints.resolve', $selected->id) }}"
+                    <form method="POST" action="<?php echo e(route('admin.complaints.resolve', $selected->id)); ?>"
                           style="margin-top:10px;">
-                        @csrf
+                        <?php echo csrf_field(); ?>
                         <button type="submit" class="btn-ghost">
-                            {{ $selected->status === 'resolved' ? 'Reopen complaint' : 'Mark as resolved' }}
+                            <?php echo e($selected->status === 'resolved' ? 'Reopen complaint' : 'Mark as resolved'); ?>
+
                         </button>
                     </form>
                 </div>
-            @else
+            <?php else: ?>
                 <div class="empty">Select a complaint on the left to read and reply.</div>
-            @endif
+            <?php endif; ?>
         </div>
     </div>
 </div>
 
-{{-- Full-size attachment viewer --}}
+
 <div id="lightbox" onclick="closeLightbox(event)">
     <button type="button" class="lb-close" onclick="closeLightbox(event, true)" aria-label="Close">&times;</button>
     <img id="lightbox-img" src="" alt="Attachment">
@@ -319,10 +329,10 @@
     });
 </script>
 
-{{-- Shared Admin sidebar styling (floating card + section pills) --}}
-@include('components.admin-sidebar')
 
-{{-- Shared responsiveness layer (drawer nav + grid stacking) --}}
-@include('components.responsive')
+<?php echo $__env->make('components.admin-sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+
+
+<?php echo $__env->make('components.responsive', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
-</html>
+</html><?php /**PATH C:\Users\PaulV\Documents\MICROCREDENTIALS NEW ADDITIONS\UPSKILL - Microcredential Platform\resources\views/admin/complaints.blade.php ENDPATH**/ ?>

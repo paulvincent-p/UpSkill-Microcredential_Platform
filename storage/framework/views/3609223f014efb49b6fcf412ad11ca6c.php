@@ -1,11 +1,4 @@
-{{-- 
-    resources/views/admin/Program_Categories.blade.php
-    Admin › Management › Program Categories
 
-    The list faculty choose from in the Category dropdown on the Create /
-    Edit Course form. Expects: $user (UserPresenter::admin), $categories
-    (CourseCategory collection, each with ->courses_using).
---}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,8 +6,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Program Categories | UPSKILL Admin</title>
 
-<link rel="icon" type="image/png" href="{{ asset('images/PSU-Logo.png') }}">
-<link rel="apple-touch-icon" href="{{ asset('images/PSU-Logo.png') }}">
+<link rel="icon" type="image/png" href="<?php echo e(asset('images/PSU-Logo.png')); ?>">
+<link rel="apple-touch-icon" href="<?php echo e(asset('images/PSU-Logo.png')); ?>">
 
 <style>
     :root {
@@ -377,13 +370,13 @@
 
 <body>
 
-{{-- Shared authenticated Admin navbar --}}
-@include('components.authenticated-topbar', ['user' => auth()->user()])
+
+<?php echo $__env->make('components.authenticated-topbar', ['user' => auth()->user()], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
 <div class="layout admin-layout">
 
-    {{-- Shared Admin sidebar --}}
-    @include('components.admin-sidebar')
+    
+    <?php echo $__env->make('components.admin-sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
     <main class="main">
 
@@ -398,45 +391,48 @@
             </div>
 
             <span class="count-pill">
-                {{ $categories->count() }}
-                categor{{ $categories->count() === 1 ? 'y' : 'ies' }}
+                <?php echo e($categories->count()); ?>
+
+                categor<?php echo e($categories->count() === 1 ? 'y' : 'ies'); ?>
+
             </span>
         </div>
 
-        @if (session('success'))
+        <?php if(session('success')): ?>
             <div class="alert alert-ok">
-                {{ session('success') }}
-            </div>
-        @endif
+                <?php echo e(session('success')); ?>
 
-        @if ($errors->any())
+            </div>
+        <?php endif; ?>
+
+        <?php if($errors->any()): ?>
             <div class="alert alert-err">
                 Please check the form:
 
                 <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
+                    <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <li><?php echo e($error); ?></li>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </ul>
             </div>
-        @endif
+        <?php endif; ?>
 
         <div class="grid">
 
-            {{-- ── List ──────────────────────────────────────── --}}
+            
             <section class="card">
 
                 <div class="card-hd">
                     All categories
                 </div>
 
-                @if ($categories->isEmpty())
+                <?php if($categories->isEmpty()): ?>
 
                     <div class="empty">
                         No categories yet. Add the first one using the form.
                     </div>
 
-                @else
+                <?php else: ?>
 
                     <table>
                         <thead>
@@ -450,31 +446,35 @@
 
                         <tbody>
 
-                        @foreach ($categories as $category)
+                        <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
 
                             <tr>
 
                                 <td>
                                     <div class="cat-name">
-                                        {{ $category->name }}
+                                        <?php echo e($category->name); ?>
+
                                     </div>
 
-                                    @if ($category->description)
+                                    <?php if($category->description): ?>
                                         <div class="cat-desc">
-                                            {{ $category->description }}
+                                            <?php echo e($category->description); ?>
+
                                         </div>
-                                    @endif
+                                    <?php endif; ?>
                                 </td>
 
                                 <td>
-                                    <span class="pill {{ $category->is_active ? 'pill-on' : 'pill-off' }}">
-                                        {{ $category->is_active ? 'Visible' : 'Hidden' }}
+                                    <span class="pill <?php echo e($category->is_active ? 'pill-on' : 'pill-off'); ?>">
+                                        <?php echo e($category->is_active ? 'Visible' : 'Hidden'); ?>
+
                                     </span>
                                 </td>
 
                                 <td>
                                     <span class="pill pill-use">
-                                        {{ $category->courses_using }}
+                                        <?php echo e($category->courses_using); ?>
+
                                     </span>
                                 </td>
 
@@ -484,25 +484,26 @@
                                         <button
                                             type="button"
                                             class="btn"
-                                            onclick="toggleEdit({{ $category->id }})">
+                                            onclick="toggleEdit(<?php echo e($category->id); ?>)">
                                             Edit
                                         </button>
 
                                         <form
                                             method="POST"
-                                            action="{{ route('admin.categories.toggle', $category->id) }}">
-                                            @csrf
+                                            action="<?php echo e(route('admin.categories.toggle', $category->id)); ?>">
+                                            <?php echo csrf_field(); ?>
 
                                             <button type="submit" class="btn">
-                                                {{ $category->is_active ? 'Hide' : 'Show' }}
+                                                <?php echo e($category->is_active ? 'Hide' : 'Show'); ?>
+
                                             </button>
                                         </form>
 
                                         <form
                                             method="POST"
-                                            action="{{ route('admin.categories.destroy', $category->id) }}"
-                                            onsubmit="return confirm('Delete “{{ $category->name }}”?{{ $category->courses_using > 0 ? ' ' . $category->courses_using . ' course(s) still use this label and will keep it until edited.' : '' }}');">
-                                            @csrf
+                                            action="<?php echo e(route('admin.categories.destroy', $category->id)); ?>"
+                                            onsubmit="return confirm('Delete “<?php echo e($category->name); ?>”?<?php echo e($category->courses_using > 0 ? ' ' . $category->courses_using . ' course(s) still use this label and will keep it until edited.' : ''); ?>');">
+                                            <?php echo csrf_field(); ?>
 
                                             <button type="submit" class="btn btn-danger">
                                                 Delete
@@ -514,45 +515,45 @@
 
                             </tr>
 
-                            {{-- Inline edit --}}
+                            
                             <tr
                                 class="edit-row"
-                                id="edit-{{ $category->id }}">
+                                id="edit-<?php echo e($category->id); ?>">
 
                                 <td colspan="4">
 
                                     <form
                                         method="POST"
-                                        action="{{ route('admin.categories.update', $category->id) }}">
+                                        action="<?php echo e(route('admin.categories.update', $category->id)); ?>">
 
-                                        @csrf
-                                        @method('PATCH')
+                                        <?php echo csrf_field(); ?>
+                                        <?php echo method_field('PATCH'); ?>
 
                                         <div class="edit-grid">
 
                                             <div>
-                                                <label for="name-{{ $category->id }}">
+                                                <label for="name-<?php echo e($category->id); ?>">
                                                     Name
                                                 </label>
 
                                                 <input
                                                     class="input"
-                                                    id="name-{{ $category->id }}"
+                                                    id="name-<?php echo e($category->id); ?>"
                                                     name="name"
-                                                    value="{{ $category->name }}"
+                                                    value="<?php echo e($category->name); ?>"
                                                     required>
                                             </div>
 
                                             <div>
-                                                <label for="desc-{{ $category->id }}">
+                                                <label for="desc-<?php echo e($category->id); ?>">
                                                     Description
                                                 </label>
 
                                                 <input
                                                     class="input"
-                                                    id="desc-{{ $category->id }}"
+                                                    id="desc-<?php echo e($category->id); ?>"
                                                     name="description"
-                                                    value="{{ $category->description }}"
+                                                    value="<?php echo e($category->description); ?>"
                                                     placeholder="Optional">
                                             </div>
 
@@ -564,7 +565,7 @@
                                                     type="checkbox"
                                                     name="is_active"
                                                     value="1"
-                                                    @checked($category->is_active)>
+                                                    <?php if($category->is_active): echo 'checked'; endif; ?>>
 
                                                 Visible
                                             </label>
@@ -584,16 +585,16 @@
 
                             </tr>
 
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
                         </tbody>
                     </table>
 
-                @endif
+                <?php endif; ?>
 
             </section>
 
-            {{-- ── Add ────────────────────────────────────────── --}}
+            
             <section class="card">
 
                 <div class="card-hd">
@@ -604,9 +605,9 @@
 
                     <form
                         method="POST"
-                        action="{{ route('admin.categories.store') }}">
+                        action="<?php echo e(route('admin.categories.store')); ?>">
 
-                        @csrf
+                        <?php echo csrf_field(); ?>
 
                         <div class="field">
 
@@ -618,7 +619,7 @@
                                 class="input"
                                 id="new-name"
                                 name="name"
-                                value="{{ old('name') }}"
+                                value="<?php echo e(old('name')); ?>"
                                 placeholder="e.g. BS Data Science"
                                 required>
 
@@ -634,7 +635,7 @@
                                 class="input"
                                 id="new-desc"
                                 name="description"
-                                value="{{ old('description') }}"
+                                value="<?php echo e(old('description')); ?>"
                                 placeholder="Optional — shown here only">
 
                         </div>
@@ -673,8 +674,8 @@
     }
 </script>
 
-{{-- Shared responsiveness layer --}}
-@include('components.responsive')
+
+<?php echo $__env->make('components.responsive', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
 </body>
-</html>
+</html><?php /**PATH C:\Users\PaulV\Documents\MICROCREDENTIALS NEW ADDITIONS\UPSKILL - Microcredential Platform\resources\views/admin/program-categories.blade.php ENDPATH**/ ?>

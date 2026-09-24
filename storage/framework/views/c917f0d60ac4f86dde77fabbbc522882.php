@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upskill – Courses &amp; Badges</title>
-    <link rel="icon" type="image/png" href="{{ asset('images/PSU-Logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('images/PSU-Logo.png') }}">
+    <link rel="icon" type="image/png" href="<?php echo e(asset('images/PSU-Logo.png')); ?>">
+    <link rel="apple-touch-icon" href="<?php echo e(asset('images/PSU-Logo.png')); ?>">
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -146,14 +146,14 @@
     </style>
 </head>
 <body>
-@include('components.authenticated-topbar', ['user' => auth()->user()])
+<?php echo $__env->make('components.authenticated-topbar', ['user' => auth()->user()], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
 <div class="layout admin-layout">
 
-    {{-- SHARED ADMIN SIDEBAR --}}
-    @include('components.admin-sidebar')
+    
+    <?php echo $__env->make('components.admin-sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-    {{-- MAIN CONTENT --}}
+    
     <main class="main">
     <div class="page-wrap">
 
@@ -165,106 +165,110 @@
             <input type="search" class="search" id="course-search" placeholder="Search courses" aria-label="Search courses">
         </div>
 
-        @php
+        <?php
             $count = fn ($key) => $courses->where('status_key', $key)->count();
-        @endphp
+        ?>
 
         <div class="tabs" role="tablist">
-            <button type="button" class="tab active" data-filter="all">All<span class="n">{{ $courses->count() }}</span></button>
-            <button type="button" class="tab" data-filter="pending">Pending review<span class="n">{{ $count('pending') }}</span></button>
-            <button type="button" class="tab" data-filter="approved">Approved<span class="n">{{ $count('approved') }}</span></button>
-            <button type="button" class="tab" data-filter="denied">Denied<span class="n">{{ $count('denied') }}</span></button>
-            <button type="button" class="tab" data-filter="draft">Drafts<span class="n">{{ $count('draft') }}</span></button>
+            <button type="button" class="tab active" data-filter="all">All<span class="n"><?php echo e($courses->count()); ?></span></button>
+            <button type="button" class="tab" data-filter="pending">Pending review<span class="n"><?php echo e($count('pending')); ?></span></button>
+            <button type="button" class="tab" data-filter="approved">Approved<span class="n"><?php echo e($count('approved')); ?></span></button>
+            <button type="button" class="tab" data-filter="denied">Denied<span class="n"><?php echo e($count('denied')); ?></span></button>
+            <button type="button" class="tab" data-filter="draft">Drafts<span class="n"><?php echo e($count('draft')); ?></span></button>
         </div>
 
-        @if (session('success'))
-            <div class="alert-success">{{ session('success') }}</div>
-        @endif
+        <?php if(session('success')): ?>
+            <div class="alert-success"><?php echo e(session('success')); ?></div>
+        <?php endif; ?>
 
-        @if ($courses->isEmpty())
+        <?php if($courses->isEmpty()): ?>
             <div class="empty-state">No courses yet. Courses created by faculty will appear here for review.</div>
-        @else
+        <?php else: ?>
             <div class="course-grid" id="course-grid">
-                @foreach ($courses as $course)
-                    <div class="course-card {{ $course->status_key === 'pending' ? 'is-pending' : '' }}"
-                         data-status="{{ $course->status_key }}"
-                         data-search="{{ strtolower($course->title . ' ' . ($course->instructor ?? '')) }}"
-                         onclick="window.location='{{ route('admin.courses.show', $course->id) }}'">
+                <?php $__currentLoopData = $courses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <div class="course-card <?php echo e($course->status_key === 'pending' ? 'is-pending' : ''); ?>"
+                         data-status="<?php echo e($course->status_key); ?>"
+                         data-search="<?php echo e(strtolower($course->title . ' ' . ($course->instructor ?? ''))); ?>"
+                         onclick="window.location='<?php echo e(route('admin.courses.show', $course->id)); ?>'">
 
                         <div class="card-top">
-                            <span class="status status-{{ $course->status_key }}">
-                                <span class="dot"></span>{{ $course->status }}
+                            <span class="status status-<?php echo e($course->status_key); ?>">
+                                <span class="dot"></span><?php echo e($course->status); ?>
+
                             </span>
 
-                            <form class="star-form" method="POST" action="{{ route('admin.courses.feature', $course->id) }}" onclick="event.stopPropagation();">
-                                @csrf
+                            <form class="star-form" method="POST" action="<?php echo e(route('admin.courses.feature', $course->id)); ?>" onclick="event.stopPropagation();">
+                                <?php echo csrf_field(); ?>
                                 <button type="submit"
-                                        class="star-btn {{ $course->is_featured ? 'is-on' : '' }}"
-                                        aria-label="{{ $course->is_featured ? 'Unfeature course' : 'Feature course on homepage' }}"
-                                        title="{{ $course->is_featured ? 'Shown on the homepage. Click to unfeature.' : 'Feature this course on the homepage' }}">
+                                        class="star-btn <?php echo e($course->is_featured ? 'is-on' : ''); ?>"
+                                        aria-label="<?php echo e($course->is_featured ? 'Unfeature course' : 'Feature course on homepage'); ?>"
+                                        title="<?php echo e($course->is_featured ? 'Shown on the homepage. Click to unfeature.' : 'Feature this course on the homepage'); ?>">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>
                                 </button>
                             </form>
                         </div>
 
-                        <div class="course-title">{{ $course->title }}</div>
+                        <div class="course-title"><?php echo e($course->title); ?></div>
 
                         <div class="course-meta">
-                            {{ $course->students }} students · {{ $course->faculty }} faculty · By {{ $course->instructor ?? 'Faculty' }}
+                            <?php echo e($course->students); ?> students · <?php echo e($course->faculty); ?> faculty · By <?php echo e($course->instructor ?? 'Faculty'); ?>
+
                         </div>
 
                         <div class="chips">
-                            <div class="chip {{ $course->badge_icon ? '' : 'off' }}">
-                                @if ($course->badge_icon)
-                                    <img src="{{ $course->badge_icon }}" alt="">
-                                @else
+                            <div class="chip <?php echo e($course->badge_icon ? '' : 'off'); ?>">
+                                <?php if($course->badge_icon): ?>
+                                    <img src="<?php echo e($course->badge_icon); ?>" alt="">
+                                <?php else: ?>
                                     <span class="blank"></span>
-                                @endif
-                                <span>{{ $course->badge ?: 'No badge yet' }}</span>
+                                <?php endif; ?>
+                                <span><?php echo e($course->badge ?: 'No badge yet'); ?></span>
                             </div>
 
-                            <div class="chip plain {{ $course->certificate_enabled ? '' : 'off' }}">
+                            <div class="chip plain <?php echo e($course->certificate_enabled ? '' : 'off'); ?>">
                                 <span>
-                                    @if (! $course->certificate_enabled)
+                                    <?php if(! $course->certificate_enabled): ?>
                                         No certificate
-                                    @else
-                                        {{ $course->certificate_mode === 'upload' ? 'Uploaded certificate' : 'Auto certificate' }}
-                                    @endif
+                                    <?php else: ?>
+                                        <?php echo e($course->certificate_mode === 'upload' ? 'Uploaded certificate' : 'Auto certificate'); ?>
+
+                                    <?php endif; ?>
                                 </span>
                             </div>
                         </div>
 
-                        {{-- "Related on": internal, faculty/admin only --}}
-                        @if (! empty($course->related_skills))
+                        
+                        <?php if(! empty($course->related_skills)): ?>
                             <div class="related">
-                                Related: {{ implode(', ', array_slice($course->related_skills, 0, 3)) }}
-                                @if (count($course->related_skills) > 3) +{{ count($course->related_skills) - 3 }} @endif
+                                Related: <?php echo e(implode(', ', array_slice($course->related_skills, 0, 3))); ?>
+
+                                <?php if(count($course->related_skills) > 3): ?> +<?php echo e(count($course->related_skills) - 3); ?> <?php endif; ?>
                             </div>
-                        @endif
+                        <?php endif; ?>
 
                         <div>
-                            <div class="progress-track"><div class="progress-fill" style="width: {{ $course->percent }}%"></div></div>
-                            <div class="pct">{{ $course->percent }}% complete</div>
+                            <div class="progress-track"><div class="progress-fill" style="width: <?php echo e($course->percent); ?>%"></div></div>
+                            <div class="pct"><?php echo e($course->percent); ?>% complete</div>
                         </div>
 
-                        @if ($course->status_key === 'pending')
+                        <?php if($course->status_key === 'pending'): ?>
                             <div class="actions" onclick="event.stopPropagation();">
-                                <form method="POST" action="{{ route('admin.courses.approve', $course->id) }}">
-                                    @csrf
+                                <form method="POST" action="<?php echo e(route('admin.courses.approve', $course->id)); ?>">
+                                    <?php echo csrf_field(); ?>
                                     <button type="submit" class="btn btn-approve">Approve</button>
                                 </form>
-                                {{-- Denial needs written feedback, captured on the detail page --}}
-                                <a href="{{ route('admin.courses.show', $course->id) }}#deny-panel">
+                                
+                                <a href="<?php echo e(route('admin.courses.show', $course->id)); ?>#deny-panel">
                                     <button type="button" class="btn">Deny</button>
                                 </a>
                             </div>
-                        @endif
+                        <?php endif; ?>
                     </div>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
 
             <div class="empty-state" id="no-match" style="display:none;">No courses match your filter.</div>
-        @endif
+        <?php endif; ?>
 
     </div>
     </main>
@@ -301,7 +305,7 @@
     })();
 </script>
 
-{{-- Back to top --}}
+
 <button id="back-to-top-btn" type="button" title="Back to top" aria-label="Back to top"
         onclick="window.scrollTo({top:0,behavior:'smooth'});">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
@@ -321,6 +325,6 @@
     })();
 </script>
 
-@include('components.responsive')
+<?php echo $__env->make('components.responsive', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
-</html>
+</html><?php /**PATH C:\Users\PaulV\Documents\MICROCREDENTIALS NEW ADDITIONS\UPSKILL - Microcredential Platform\resources\views/admin/courses/index.blade.php ENDPATH**/ ?>
