@@ -1,19 +1,12 @@
-{{--
-    resources/views/auth/verify-code.blade.php
 
-    Step 2 of the reset flow: enter the 6-digit code that was emailed.
-
-    Standalone document, matching login.blade.php and the other two reset
-    screens.
---}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Email Verification – UpSkill PSU</title>
-    <link rel="icon" type="image/png" href="{{ asset('images/PSU-Logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('images/PSU-Logo.png') }}">
+    <link rel="icon" type="image/png" href="<?php echo e(asset('images/PSU-Logo.png')); ?>">
+    <link rel="apple-touch-icon" href="<?php echo e(asset('images/PSU-Logo.png')); ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@700;800;900&display=swap" rel="stylesheet">
@@ -149,28 +142,28 @@
     <div class="auth-card">
 
         <div class="auth-seal">
-            <img src="{{ asset('images/PSU-Logo.png') }}" alt="PSU Logo">
+            <img src="<?php echo e(asset('images/PSU-Logo.png')); ?>" alt="PSU Logo">
         </div>
 
         <h1 class="auth-heading">Email Verification</h1>
         <p class="auth-sub">
-            We sent a 6-digit verification code to <strong>{{ $email }}</strong>.
+            We sent a 6-digit verification code to <strong><?php echo e($email); ?></strong>.
             Enter it below to continue. The code expires in
-            {{ config('emailjs.code_ttl_minutes') }} minutes.
+            <?php echo e(config('emailjs.code_ttl_minutes')); ?> minutes.
         </p>
 
-        @if (session('status'))
-            <div class="alert alert-ok">{{ session('status') }}</div>
-        @endif
+        <?php if(session('status')): ?>
+            <div class="alert alert-ok"><?php echo e(session('status')); ?></div>
+        <?php endif; ?>
 
-        @if ($errors->any())
+        <?php if($errors->any()): ?>
             <div class="alert alert-err">
-                @foreach ($errors->all() as $error)<div>{{ $error }}</div>@endforeach
+                <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><div><?php echo e($error); ?></div><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
-        @endif
+        <?php endif; ?>
 
-        <form method="POST" action="{{ route('password.verify.submit') }}">
-            @csrf
+        <form method="POST" action="<?php echo e(route('password.verify.submit')); ?>">
+            <?php echo csrf_field(); ?>
 
             <div class="field">
                 <label for="code">Verification Code</label>
@@ -185,12 +178,12 @@
 
         <div class="auth-foot">
             Didn't get it?
-            <form method="POST" action="{{ route('password.resend') }}" style="display:inline;">
-                @csrf
+            <form method="POST" action="<?php echo e(route('password.resend')); ?>" style="display:inline;">
+                <?php echo csrf_field(); ?>
                 <button type="submit" class="link-btn">Send a new code</button>
             </form>
             <br>
-            <a href="{{ route('password.request') }}">Use a different email</a>
+            <a href="<?php echo e(route('password.request')); ?>">Use a different email</a>
         </div>
 
     </div>
@@ -206,7 +199,8 @@
 </script>
 
 
-    {{-- Shared responsiveness layer (drawer nav + grid stacking) --}}
-    @include('components.responsive')
+    
+    <?php echo $__env->make('components.responsive', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
 </html>
+<?php /**PATH C:\Users\Kurt Palavino\Herd\UpSkill-Microcredential_Platform\resources\views/auth/verify-code.blade.php ENDPATH**/ ?>
