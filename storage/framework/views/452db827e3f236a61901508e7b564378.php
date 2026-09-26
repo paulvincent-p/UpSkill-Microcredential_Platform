@@ -1,8 +1,6 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'UpSkill – The Official Platform for PSU Microcredentials'); ?>
 
-@section('title', 'UpSkill – The Official Platform for PSU Microcredentials')
-
-@push('styles')
+<?php $__env->startPush('styles'); ?>
 <style>
     .hero {
         position: relative;
@@ -23,7 +21,7 @@
     .hero::before {
         inset: 0;
         border-radius: 0;
-        background: linear-gradient(90deg, rgba(18, 53, 199, 0.18), rgba(18, 53, 199, 0.04)), url('{{ asset('Images/legacy-building.jpg') }}') center / cover no-repeat;
+        background: linear-gradient(90deg, rgba(18, 53, 199, 0.18), rgba(18, 53, 199, 0.04)), url('<?php echo e(asset('Images/legacy-building.jpg')); ?>') center / cover no-repeat;
         -webkit-mask-image: linear-gradient(90deg, transparent 0%, transparent 28%, rgba(0, 0, 0, 0.55) 52%, #000 78%);
         mask-image: linear-gradient(90deg, transparent 0%, transparent 28%, rgba(0, 0, 0, 0.55) 52%, #000 78%);
         z-index: 0;
@@ -348,7 +346,7 @@
         width: 100%;
         height: 78.14vw;
         margin: -31vw 0 0;
-        background: url('{{ asset('Images/divider.png') }}') center center / 100% auto no-repeat;
+        background: url('<?php echo e(asset('Images/divider.png')); ?>') center center / 100% auto no-repeat;
         transform: scaleY(0.7);
         transform-origin: top center;
     }
@@ -512,7 +510,7 @@
         content: "";
         position: absolute;
         inset: 0;
-        background: url('{{ asset('Images/divider 4.png') }}') center calc(100% + 150px) / 100% auto no-repeat;
+        background: url('<?php echo e(asset('Images/divider 4.png')); ?>') center calc(100% + 150px) / 100% auto no-repeat;
         pointer-events: none;
     }
 
@@ -563,7 +561,7 @@
 
     .how-it-works {
         position: relative;
-        background: var(--navy) url('{{ asset('images/Green_field_PSU.jpg') }}') center/cover no-repeat;
+        background: var(--navy) url('<?php echo e(asset('images/Green_field_PSU.jpg')); ?>') center/cover no-repeat;
         padding: 5rem 0;
     }
 
@@ -724,7 +722,7 @@
         position: relative;
         padding: 5rem 0;
         text-align: center;
-        background: var(--gold-bg) url('{{ asset('images/PSU_Front_Building.jpg') }}') center/cover no-repeat;
+        background: var(--gold-bg) url('<?php echo e(asset('images/PSU_Front_Building.jpg')); ?>') center/cover no-repeat;
     }
 
     .cta-banner::before {
@@ -782,9 +780,9 @@
         }
     }
 </style>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 <section class="hero">
     <div class="container hero__inner">
         <div>
@@ -793,25 +791,25 @@
             <p class="hero__subtitle">Explore practical microcredentials designed for students, people, and professionals who want to build real-world skills at PSU.</p>
 
             <div class="hero__actions">
-                <a href="{{ url('/register') }}" class="btn btn-gold hero__cta">Get Started</a>
+                <a href="<?php echo e(url('/register')); ?>" class="btn btn-gold hero__cta">Get Started</a>
                 <a href="#announcements" class="btn hero__cta" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #fff;" onclick="smoothScrollTo('announcements', event)">Announcements</a>
             </div>
 
             <div class="hero__stats">
                 <div class="hero__stat">
-                    <div class="hero__stat-num" data-count="{{ $stats['courses'] ?? 0 }}">0</div>
+                    <div class="hero__stat-num" data-count="<?php echo e($stats['courses'] ?? 0); ?>">0</div>
                     <div class="hero__stat-label">Courses</div>
                 </div>
                 <div class="hero__stat">
-                    <div class="hero__stat-num" data-count="{{ $stats['learners'] ?? 0 }}">0</div>
+                    <div class="hero__stat-num" data-count="<?php echo e($stats['learners'] ?? 0); ?>">0</div>
                     <div class="hero__stat-label">Learners</div>
                 </div>
                 <div class="hero__stat">
-                    <div class="hero__stat-num" data-count="{{ $stats['certificates'] ?? 0 }}">0</div>
+                    <div class="hero__stat-num" data-count="<?php echo e($stats['certificates'] ?? 0); ?>">0</div>
                     <div class="hero__stat-label">Certificates</div>
                 </div>
                 <div class="hero__stat">
-                    <div class="hero__stat-num" data-count="{{ $stats['badges'] ?? 0 }}">0</div>
+                    <div class="hero__stat-num" data-count="<?php echo e($stats['badges'] ?? 0); ?>">0</div>
                     <div class="hero__stat-label">Badges</div>
                 </div>
             </div>
@@ -822,35 +820,35 @@
                 <div class="hero__panel-body">
                     <div class="hero__carousel" data-carousel>
                         <div class="hero__slide active">
-                            <img src="{{ asset('Images/legacy-building.jpg') }}" alt="Historic PSU campus building">
+                            <img src="<?php echo e(asset('Images/legacy-building.jpg')); ?>" alt="Historic PSU campus building">
                             <div class="hero__slide-caption">
                                 <small>PSU campus</small>
                                 <strong>Rooted in a tradition of learning</strong>
                             </div>
                         </div>
                         <div class="hero__slide">
-                            <img src="{{ asset('Images/Green_field_PSU.jpg') }}" alt="Green field at PSU">
+                            <img src="<?php echo e(asset('Images/Green_field_PSU.jpg')); ?>" alt="Green field at PSU">
                             <div class="hero__slide-caption">
                                 <small>Learn at PSU</small>
                                 <strong>Make space for your next skill</strong>
                             </div>
                         </div>
                         <div class="hero__slide">
-                            <img src="{{ asset('Images/Level-Up-Your-Skills.jpg') }}" alt="Level up your skills">
+                            <img src="<?php echo e(asset('Images/Level-Up-Your-Skills.jpg')); ?>" alt="Level up your skills">
                             <div class="hero__slide-caption">
                                 <small>Build confidence</small>
                                 <strong>Level up your skills</strong>
                             </div>
                         </div>
                         <div class="hero__slide">
-                            <img src="{{ asset('Images/Learn-at-your-own-pace.jpg') }}" alt="Learn at your own pace">
+                            <img src="<?php echo e(asset('Images/Learn-at-your-own-pace.jpg')); ?>" alt="Learn at your own pace">
                             <div class="hero__slide-caption">
                                 <small>Flexible learning</small>
                                 <strong>Learn at your own pace</strong>
                             </div>
                         </div>
                         <div class="hero__slide">
-                            <img src="{{ asset('Images/Earn-Credentials.jpg') }}" alt="Earn credentials through learning">
+                            <img src="<?php echo e(asset('Images/Earn-Credentials.jpg')); ?>" alt="Earn credentials through learning">
                             <div class="hero__slide-caption">
                                 <small>Show what you know</small>
                                 <strong>Earn credentials that matter</strong>
@@ -875,7 +873,7 @@
 
 <div class="hero-divider" aria-hidden="true"></div>
 
-@php $featuredCourses = $featuredCourses ?? []; @endphp
+<?php $featuredCourses = $featuredCourses ?? []; ?>
 <section class="featured" id="featured">
     <div class="container">
         <div class="section-header">
@@ -883,16 +881,16 @@
             <span class="section-tag">Popular picks</span>
         </div>
 
-        <div class="courses-grid {{ count($featuredCourses) === 1 ? 'courses-grid--single' : '' }}">
-            @forelse($featuredCourses as $course)
-                @include('components.course-card', ['course' => $course])
-            @empty
+        <div class="courses-grid <?php echo e(count($featuredCourses) === 1 ? 'courses-grid--single' : ''); ?>">
+            <?php $__empty_1 = true; $__currentLoopData = $featuredCourses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                <?php echo $__env->make('components.course-card', ['course' => $course], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <p style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:2rem 0 0;">No featured courses right now — check out the latest courses below.</p>
-            @endforelse
+            <?php endif; ?>
         </div>
 
         <div class="featured__footer">
-            <a href="{{ url('/explore') }}" class="btn btn-gold">View all courses</a>
+            <a href="<?php echo e(url('/explore')); ?>" class="btn btn-gold">View all courses</a>
         </div>
     </div>
 </section>
@@ -956,22 +954,22 @@
             <span class="section-tag">Latest updates</span>
         </div>
 
-        @php $announcements = $announcements ?? []; @endphp
+        <?php $announcements = $announcements ?? []; ?>
         <div class="announcements-list" id="announcements-list">
-            @forelse($announcements as $ann)
-                <div class="ann-card ann-card--{{ $ann['type'] }}">
+            <?php $__empty_1 = true; $__currentLoopData = $announcements; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ann): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                <div class="ann-card ann-card--<?php echo e($ann['type']); ?>">
                     <div class="ann-card__body">
                         <div class="ann-card__meta">
-                            <span class="ann-card__type">{{ $ann['label'] }}</span>
-                            <span class="ann-card__date">{{ $ann['date'] }}</span>
+                            <span class="ann-card__type"><?php echo e($ann['label']); ?></span>
+                            <span class="ann-card__date"><?php echo e($ann['date']); ?></span>
                         </div>
-                        <div class="ann-card__title">{{ $ann['title'] }}</div>
-                        <p class="ann-card__desc">{{ $ann['desc'] }}</p>
+                        <div class="ann-card__title"><?php echo e($ann['title']); ?></div>
+                        <p class="ann-card__desc"><?php echo e($ann['desc']); ?></p>
                     </div>
                 </div>
-            @empty
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <p style="color:var(--muted);padding:18px 4px;">No announcements yet — check back soon for new courses and site updates.</p>
-            @endforelse
+            <?php endif; ?>
         </div>
     </div>
 </section>
@@ -984,10 +982,10 @@
         </div>
 
         <div class="courses-grid">
-            @php $latestCourses = $latestCourses ?? []; @endphp
-            @foreach($latestCourses as $course)
-                @include('components.course-card', ['course' => $course])
-            @endforeach
+            <?php $latestCourses = $latestCourses ?? []; ?>
+            <?php $__currentLoopData = $latestCourses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php echo $__env->make('components.course-card', ['course' => $course], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     </div>
 </section>
@@ -996,11 +994,11 @@
     <div class="container">
         <h2 class="cta-banner__title">Ready to grow with PSU?</h2>
         <p class="cta-banner__sub">Join the UpSkill community and build the next step in your learning journey.</p>
-        <a href="{{ url('/register') }}" class="btn btn-navy">Create free account</a>
+        <a href="<?php echo e(url('/register')); ?>" class="btn btn-navy">Create free account</a>
     </div>
 </section>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
     function smoothScrollTo(id, e) {
         if (e) e.preventDefault();
@@ -1113,13 +1111,10 @@
         startAutoplay();
     })();
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
 
-{{-- ═══════════ Scanned certificate (from a QR code) ═══════════
-     A QR encodes /?certificate=SERIAL, so scanning lands on the real
-     homepage with the certificate floating over it. Unknown serials pass
-     through silently and the homepage renders as normal. --}}
-@if (!empty($scannedCertificate))
+
+<?php if(!empty($scannedCertificate)): ?>
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Dancing+Script:wght@600&family=Parisienne&family=Sacramento&family=Homemade+Apple&display=swap" rel="stylesheet">
 <div class="certfloat-overlay" id="certFloat" onclick="if(event.target===this)closeCertFloat()">
     <div class="certfloat">
@@ -1130,7 +1125,7 @@
             Verified Certificate
         </div>
 
-        @include('components.certificate', ['cert' => $scannedCertificate])
+        <?php echo $__env->make('components.certificate', ['cert' => $scannedCertificate], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
         <button type="button" class="certfloat__btn" onclick="closeCertFloat()">Continue to UPSKILL</button>
     </div>
@@ -1168,6 +1163,8 @@ function closeCertFloat(){
 }
 document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCertFloat(); });
 </script>
-@endif
+<?php endif; ?>
 
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\PaulV\Documents\MICROCREDENTIALS NEW ADDITIONS\UPSKILL - Microcredential Platform\resources\views/public/home.blade.php ENDPATH**/ ?>
