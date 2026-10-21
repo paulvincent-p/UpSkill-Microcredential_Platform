@@ -15,7 +15,6 @@
         'levels'                => ['Beginner', 'Intermediate', 'Advanced'],
         'skillGroups'           => ['Field' => ['Skill', ...], ...],
         'skillOptions'          => [...],
-        'competencyUnitOptions' => $units,   // ->id, ->title
         'prereqOptions'         => $courses, // ->id, ->title, ->category
         'editing'               => false,
         'course'                => null,
@@ -164,15 +163,6 @@
     .competency-remove{flex:0 0 auto;display:inline-flex;width:22px;height:22px;align-items:center;justify-content:center;border:0;border-radius:5px;background:transparent;color:var(--f-muted);font-size:17px;line-height:1;padding:0;cursor:pointer;}
     .competency-remove:hover{background:#e4e7ec;color:var(--f-strong);}
 
-    /* ── Learning outcomes ───────────────────────────────────── */
-    .outcome-head,.learning-outcome-row{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 38px;gap:10px;align-items:center;}
-    .outcome-head{margin-bottom:6px;font-size:12px;font-weight:600;color:var(--f-muted);}
-    .learning-outcome-row{margin-bottom:10px;}
-    .learning-outcome-row .competency-remove{width:38px;height:38px;border:1px solid var(--f-border-soft);border-radius:var(--f-radius);background:#fff;}
-    .learning-outcome-row .competency-remove:hover{background:#fef3f2;border-color:#fecdca;color:var(--f-danger);}
-    #learning-outcomes-list:empty+.outcome-empty{display:block;}
-    .outcome-empty{display:none;padding:14px 16px;border:1px dashed var(--f-border);border-radius:var(--f-radius);font-size:13px;color:var(--f-muted);}
-
     /* ── Thumbnail picker ────────────────────────────────────── */
     .file-picker{display:flex;align-items:center;gap:10px;flex-wrap:wrap;max-width:100%;}
     .file-type-select{
@@ -305,11 +295,6 @@
     @media (max-width:900px){
         .main{padding:24px 20px 20px;}
         .field-grid,.field-grid.cols-3{grid-template-columns:minmax(0,1fr);gap:18px;}
-        .outcome-head{display:none;}
-        .learning-outcome-row{grid-template-columns:minmax(0,1fr) 38px;}
-        .learning-outcome-row .select-wrap{grid-column:1;grid-row:2;}
-        .learning-outcome-row .competency-remove{grid-column:2;grid-row:1;}
-        .learning-outcome-row{padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid var(--f-border-soft);}
     }
     @media (max-width:560px){
         .main{padding:20px 14px 16px;}
@@ -394,19 +379,20 @@
                     $savedCompetencies = old('competencies', isset($course) && $course ? ($course->skills ?? []) : []);
                     $savedCompetencies = is_array($savedCompetencies) ? $savedCompetencies : [];
 
-                    $savedOutcomes = old('learning_outcomes');
-                    if (! is_array($savedOutcomes)) {
-                        $savedOutcomes = [];
-                        if (isset($course) && $course) {
-                            $savedOutcomes = $course->learningOutcomes
-                                ->map(fn ($outcome) => ['description' => $outcome->description, 'competency_unit_id' => $outcome->competency_unit_id])
-                                ->all();
-                            if ($savedOutcomes === []) {
-                                $savedOutcomes = collect($course->objectives ?? [])
-                                    ->map(fn ($objective) => ['description' => $objective, 'competency_unit_id' => null])
-                                    ->all();
-                            }
+                    $savedOutcomes = old('learning_outcomes_content');
+                    if (! is_string($savedOutcomes)) {
+                        $outcomeDescriptions = isset($course) && $course
+                            ? $course->learningOutcomes->pluck('description')->all()
+                            : [];
+                        if ($outcomeDescriptions === [] && isset($course) && $course) {
+                            $outcomeDescriptions = $course->objectives ?? [];
                         }
+
+                        $savedOutcomes = count($outcomeDescriptions) === 1
+                            ? (string) $outcomeDescriptions[0]
+                            : ($outcomeDescriptions === []
+                                ? ''
+                                : '<ul><li>'.implode('</li><li>', array_map('e', $outcomeDescriptions)).'</li></ul>');
                     }
 
                     $selectedPrereqs = collect(old('prerequisite_ids', $course->prerequisite_ids ?? []))
@@ -643,35 +629,14 @@
                     <div class="form-card-body">
 
                         <div class="field">
-                            <span class="label">Measurable learning outcomes</span>
-
-                            <div class="outcome-head" aria-hidden="true">
-                                <span>Outcome</span>
-                                <span>Competency unit</span>
-                                <span></span>
-                            </div>
-                            <div id="learning-outcomes-list">
-                                @foreach ($savedOutcomes as $outcomeIndex => $outcome)
-                                    <div class="learning-outcome-row">
-                                        <input class="input" name="learning_outcomes[{{ $outcomeIndex }}][description]"
-                                               value="{{ $outcome['description'] ?? '' }}" maxlength="2000"
-                                               aria-label="Learning outcome"
-                                               placeholder="Observable outcome (e.g. Build a responsive page)" required>
-                                        <div class="select-wrap">
-                                            <select class="select" name="learning_outcomes[{{ $outcomeIndex }}][competency_unit_id]" aria-label="Competency unit">
-                                                <option value="">No competency mapping</option>
-                                                @foreach ($competencyUnitOptions ?? [] as $unit)
-                                                    <option value="{{ $unit->id }}" @selected((string) ($outcome['competency_unit_id'] ?? '') === (string) $unit->id)>{{ $unit->title }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <button class="competency-remove" type="button" aria-label="Remove outcome" onclick="this.closest('.learning-outcome-row').remove()">&times;</button>
-                                    </div>
-                                @endforeach
-                            </div>
-                            <div class="outcome-empty">No outcomes yet. Add the first one below.</div>
-                            <button class="competency-add btn-ghost" type="button" id="add-learning-outcome">Add outcome</button>
-                            <small class="field-hint">Write outcomes as observable actions. Map each to a competency unit when one applies. Outcomes appear to students and in credential records.</small>
+                            <label class="label" for="learning-outcomes-editor">Measurable learning outcomes</label>
+                            @include('components.rich-text-editor', [
+                                'name' => 'learning_outcomes_content',
+                                'id' => 'learning-outcomes-editor',
+                                'value' => $savedOutcomes,
+                                'placeholder' => 'Describe what learners will be able to do after completing this micro-credential.',
+                            ])
+                            <small class="field-hint">Describe observable actions. These outcomes appear to students and in credential records.</small>
                         </div>
 
                         <div class="field field-grid">
@@ -1072,7 +1037,7 @@
         } catch (e) {}
 
         // Only plain single-value fields are drafted. Array fields
-        // (competencies[], related_skills[], learning_outcomes[...]) and hidden
+        // (competencies[], related_skills[]) and hidden
         // inputs are skipped so restoring cannot overwrite checkbox values.
         function isDraftable(f) {
             if (!f.name || f.name.indexOf('[') !== -1) return false;
@@ -1222,51 +1187,5 @@
     }
 </script>
 
-<script>
-(() => {
-    const addButton = document.getElementById('add-learning-outcome');
-    const list = document.getElementById('learning-outcomes-list');
-    const competencyUnits = @json(($competencyUnitOptions ?? collect())->map(fn ($unit) => ['id' => $unit->id, 'title' => $unit->title])->values());
-    if (!addButton || !list) return;
-
-    addButton.addEventListener('click', () => {
-        const indexes = Array.from(list.querySelectorAll('input[name$="[description]"]'))
-            .map((input) => Number((input.name.match(/learning_outcomes\[(\d+)\]/) || [])[1] || -1));
-        const index = Math.max(-1, ...indexes) + 1;
-
-        const row = document.createElement('div');
-        row.className = 'learning-outcome-row';
-
-        const description = document.createElement('input');
-        description.className = 'input';
-        description.name = `learning_outcomes[${index}][description]`;
-        description.maxLength = 2000;
-        description.required = true;
-        description.setAttribute('aria-label', 'Learning outcome');
-        description.placeholder = 'Observable outcome (e.g. Build a responsive page)';
-
-        const wrap = document.createElement('div');
-        wrap.className = 'select-wrap';
-        const select = document.createElement('select');
-        select.className = 'select';
-        select.name = `learning_outcomes[${index}][competency_unit_id]`;
-        select.setAttribute('aria-label', 'Competency unit');
-        select.add(new Option('No competency mapping', ''));
-        competencyUnits.forEach((unit) => select.add(new Option(unit.title, unit.id)));
-        wrap.appendChild(select);
-
-        const remove = document.createElement('button');
-        remove.className = 'competency-remove';
-        remove.type = 'button';
-        remove.setAttribute('aria-label', 'Remove outcome');
-        remove.textContent = '\u00d7';
-        remove.addEventListener('click', () => row.remove());
-
-        row.append(description, wrap, remove);
-        list.appendChild(row);
-        description.focus();
-    });
-})();
-</script>
 </body>
 </html>

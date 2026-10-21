@@ -116,6 +116,12 @@ Route::middleware(['auth', PreventBackHistory::class])
 Route::middleware(['auth', PreventBackHistory::class])
     ->get('/notifications/preview', [PageController::class, 'notificationPreview'])
     ->name('notifications.preview');
+Route::middleware(['auth', PreventBackHistory::class])
+    ->post('/notifications/{notification}/read', [PageController::class, 'markNotificationRead'])
+    ->whereNumber('notification')->name('notifications.read');
+Route::middleware(['auth', PreventBackHistory::class])
+    ->post('/notifications/announcements/{announcement}/read', [PageController::class, 'markAnnouncementRead'])
+    ->whereNumber('announcement')->name('notifications.announcements.read');
 Route::get('/search', [PageController::class, 'search'])->name('search');
 
 // Help Center — the footer has always linked to /help, but nothing was
@@ -179,6 +185,8 @@ Route::middleware([PreventBackHistory::class, RoleBasedAccess::class.':admin', R
     Route::get('/Admin-usermanagement', [AdminController::class, 'userManagement'])->name('admin.usermanagement');
     Route::post('/Admin-usermanagement/users', [AdminController::class, 'storeUser'])->name('admin.users.store');
     Route::get('/Admin-usermanagement/users/{id}', [AdminController::class, 'showUser'])->whereNumber('id')->name('admin.users.show');
+    Route::patch('/Admin-usermanagement/users/{id}/access', [AdminController::class, 'updateSubAdminAccess'])
+        ->whereNumber('id')->name('admin.users.access.update');
     // #2 — delete a student / faculty account
     Route::post('/Admin-usermanagement/users/{id}/delete', [AdminController::class, 'destroyUser'])
         ->whereNumber('id')->name('admin.users.destroy');

@@ -34,3 +34,25 @@ test('admin course details use the short description and avoid repeating level a
         ->and($metaRow[1])->not->toContain('Intermediate')
         ->and($metaRow[1])->not->toContain('4h');
 });
+
+test('admin course review details show faculty change notes and previous denial feedback', function () {
+    $faculty = User::factory()->faculty()->create();
+    $admin = User::factory()->admin()->create();
+    $course = Course::create([
+        'title' => 'Reviewed Course',
+        'slug' => 'reviewed-course',
+        'short_description' => 'Course summary.',
+        'category' => 'Information Technology',
+        'created_by' => $faculty->id,
+        'change_note' => 'Changed thumbnail',
+        'denial_feedback' => 'Please update the assessment criteria.',
+    ]);
+
+    $this->actingAs($admin)
+        ->get(route('admin.courses.show', $course->id))
+        ->assertOk()
+        ->assertSeeText('What the author changed')
+        ->assertSeeText('Changed thumbnail')
+        ->assertSeeText('Previous denial feedback')
+        ->assertSeeText('Please update the assessment criteria.');
+});

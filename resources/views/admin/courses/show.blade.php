@@ -465,11 +465,15 @@
                     <p><strong>Mastery criteria:</strong> {{ $course->grading_rubric ?: 'Not specified' }}</p>
                     @if(!empty($course->learning_outcomes))
                         <strong class="outcome-heading">Measurable learning outcomes</strong>
-                        <ul class="obj-list">
-                            @foreach($course->learning_outcomes as $outcome)
-                                <li>{{ $outcome }}</li>
-                            @endforeach
-                        </ul>
+                        @if(count($course->learning_outcomes) === 1)
+                            <div class="rich-content">{!! \App\Support\RichTextSanitizer::sanitize($course->learning_outcomes[0]) !!}</div>
+                        @else
+                            <ul class="obj-list">
+                                @foreach($course->learning_outcomes as $outcome)
+                                    <li>{{ $outcome }}</li>
+                                @endforeach
+                            </ul>
+                        @endif
                     @endif
                 </section>
 

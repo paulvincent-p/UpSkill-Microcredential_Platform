@@ -280,7 +280,10 @@ class PageController extends Controller
         $complaint = Complaint::findOrFail($id);
         $viewer = Auth::user();
 
-        abort_unless($viewer->isAdmin() || (int) $complaint->user_id === (int) $viewer->id, 403);
+        $hasAdminAccess = $viewer->isAdmin()
+            && (! $viewer->isSubAdmin() || $viewer->canAccessAdminPage('complaints'));
+
+        abort_unless($hasAdminAccess || (int) $complaint->user_id === (int) $viewer->id, 403);
 
         $filename = basename((string) $complaint->attachment_url);
         abort_if($filename === '' || $filename === '.', 404);
@@ -429,14 +432,56 @@ class PageController extends Controller
         return response()->json([
             'notifications' => $userNotifications->feed(Auth::user(), 8)
                 ->map(fn (object $notification): array => [
+                    'id' => $notification->id ?? null,
                     'title' => $notification->title,
                     'message' => $notification->message,
                     'time' => $notification->time,
+                    'type' => $notification->type,
+                    'announcement_id' => $notification->type === 'announcement' ? $notification->entity_id : null,
+                    'content' => $notification->type === 'announcement' ? $notification->content : null,
                     'unread' => $notification->unread,
                     'url' => $notification->url,
                 ])
                 ->take(8)
                 ->values(),
+        ]);
+    }
+
+    /** Mark one of the signed-in user's stored notifications as read. */
+    public function markNotificationRead(Notification $notification): JsonResponse
+    {
+        abort_unless((int) $notification->user_id === (int) Auth::id(), 404);
+
+        if (! $notification->is_read) {
+            $notification->is_read = true;
+            $notification->save();
+        }
+
+        return response()->json([
+            'unread_count' => app(UserNotificationService::class)->unreadCount(Auth::user()),
+        ]);
+    }
+
+    /** Mark a visible announcement as read using the live-feed watermark. */
+    public function markAnnouncementRead(Announcement $announcement): JsonResponse
+    {
+        $user = Auth::user();
+
+        abort_unless(
+            $announcement->is_published && $announcement->visibleTo($user->roleName()),
+            404
+        );
+
+        $publishedAt = $announcement->published_at ?? $announcement->created_at ?? now();
+        $readAt = $user->notifications_read_at;
+
+        if (! $readAt || $publishedAt->gt($readAt)) {
+            $user->notifications_read_at = $publishedAt;
+            $user->save();
+        }
+
+        return response()->json([
+            'unread_count' => app(UserNotificationService::class)->unreadCount($user),
         ]);
     }
 
@@ -549,17 +594,20 @@ class PageController extends Controller
 
         // Same zero-inclusive badge counters the dashboard renders, so the
         // 15-second polling can refresh the Recent Badges panel live.
-        $recentBadges = DB::table('badges')
-            ->leftJoin('user_badges', 'user_badges.badge_id', '=', 'badges.id')
-            ->select('badges.name', DB::raw('COUNT(user_badges.id) as earned_count'))
-            ->groupBy('badges.id', 'badges.name')
-            ->orderByDesc('earned_count')
-            ->orderBy('badges.name')
-            ->limit(4)
-            ->get()
-            ->map(fn ($row) => ['name' => $row->name, 'earned_count' => (int) $row->earned_count])
-            ->values()
-            ->all();
+        $recentBadges = [];
+        if (Auth::user()->canAccessAdminPage('credentials')) {
+            $recentBadges = DB::table('badges')
+                ->leftJoin('user_badges', 'user_badges.badge_id', '=', 'badges.id')
+                ->select('badges.name', DB::raw('COUNT(user_badges.id) as earned_count'))
+                ->groupBy('badges.id', 'badges.name')
+                ->orderByDesc('earned_count')
+                ->orderBy('badges.name')
+                ->limit(4)
+                ->get()
+                ->map(fn ($row) => ['name' => $row->name, 'earned_count' => (int) $row->earned_count])
+                ->values()
+                ->all();
+        }
 
         return response()->json(compact('stats', 'activity', 'recentBadges'));
     }

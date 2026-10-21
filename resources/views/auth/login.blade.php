@@ -332,9 +332,6 @@
                 <div class="slider__seal">
                     <img src="{{ asset('images/PSU-Logo.png') }}" alt="PSU">
                 </div>
-                <div class="slider__seal">
-                    <img src="{{ asset('images/CCS-Logo.png') }}" alt="CCS">
-                </div>
             </div>
 
             <div class="slide slide-1 active" style="background-image: url('{{ asset('images/Level-Up-Your-Skills.jpg') }}')"></div>

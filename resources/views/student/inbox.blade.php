@@ -128,7 +128,13 @@
                                     {{ $reply->is_admin ? 'Administrator' : 'You' }}
                                     - {{ $reply->created_at?->diffForHumans() }}
                                 </div>
-                                <div class="bubble">{{ $reply->body }}</div>
+                                <div class="bubble">
+                                    @if ($reply->is_admin)
+                                        {!! \App\Support\RichTextSanitizer::sanitize($reply->body) !!}
+                                    @else
+                                        {{ $reply->body }}
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     @endforeach

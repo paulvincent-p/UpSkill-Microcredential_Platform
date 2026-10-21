@@ -12,7 +12,8 @@
     {{-- Browser tab icon (favicon) --}}
     <link rel="icon" type="image/png" href="{{ asset('images/PSU-Logo.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('images/PSU-Logo.png') }}">
-    @vite('resources/css/inbox-reply.css')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    @vite(['resources/js/app.js', 'resources/css/inbox-reply.css'])
 <style>
     :root{--navy:#13176b;--gold:#dba617;--muted:#6b7280;--line:#e5e7eb;--green:#15803d;
           --red:#ef4444;--shadow:0 10px 25px rgba(19,23,107,.08);--topbar-h:60px;}
@@ -264,7 +265,13 @@
                                     {{ $reply->is_admin ? 'Administrator' : ($reply->author->name ?? 'Student') }}
                                     · {{ $reply->created_at?->diffForHumans() }}
                                 </div>
-                                <div class="bubble">{{ $reply->body }}</div>
+                                <div class="bubble">
+                                    @if ($reply->is_admin)
+                                        {!! \App\Support\RichTextSanitizer::sanitize($reply->body) !!}
+                                    @else
+                                        {{ $reply->body }}
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     @endforeach
@@ -273,9 +280,13 @@
                 <div class="reply-box">
                     <form class="inbox-reply-compose" method="POST" action="{{ route('admin.complaints.reply', $selected->id) }}">
                         @csrf
-                        <textarea name="body"
-                            placeholder="{{ $selected->isFromVisitor() ? 'Write your reply — it will be emailed to them…' : 'Write your reply to the student…' }}"
-                            required></textarea>
+                        <x-rich-text-editor
+                            id="admin-reply"
+                            name="body"
+                            :value="old('body')"
+                            preset="admin-reply"
+                            :placeholder="$selected->isFromVisitor() ? 'Write your reply — it will be emailed to them…' : 'Write your reply to the student…'"
+                        />
                         <div class="reply-actions">
                             <button type="submit" class="btn-navy">Send Reply</button>
                         </div>

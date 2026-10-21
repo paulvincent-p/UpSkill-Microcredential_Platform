@@ -1228,6 +1228,41 @@ class StudentController extends Controller
         return true;
     }
 
+    private function lessonRequirementsBeforeQuizSatisfied(CourseLesson $lesson, Quiz $quiz, int $userId): bool
+    {
+        $lesson->loadMissing(['activities', 'quizzes.questions']);
+
+        foreach ($lesson->activities
+            ->where('is_active', true)
+            ->where('is_required', true)
+            ->where('sort_order', '<=', $quiz->sort_order) as $activity) {
+            $acceptedStatuses = $activity->activity_type === 'assignment' ? ['passed'] : ['completed', 'passed'];
+            if (! $activity->submissions()->where('user_id', $userId)->whereIn('status', $acceptedStatuses)->exists()) {
+                return false;
+            }
+        }
+
+        foreach ($lesson->quizzes
+            ->where('is_active', true)
+            ->where('sort_order', '<', $quiz->sort_order)
+            ->where('id', '!=', $quiz->id) as $earlierQuiz) {
+            if ($earlierQuiz->questions->isEmpty()) {
+                continue;
+            }
+
+            if (! QuizAttempt::query()
+                ->where('quiz_id', $earlierQuiz->id)
+                ->where('user_id', $userId)
+                ->where('passed', true)
+                ->whereNotNull('submitted_at')
+                ->exists()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private function lessonRequirementsSatisfied(CourseLesson $lesson, int $userId): bool
     {
         if (! $this->lessonActivitiesSatisfied($lesson, $userId)) {
@@ -1303,7 +1338,7 @@ class StudentController extends Controller
                 if ((int) $lesson->id === (int) $quiz->lesson_id) {
                     return ($this->lessonIsServerVerified((int) $lesson->id, $userId)
                             || session()->has($this->lessonContinuedSessionKey($userId, (int) $course->id, (int) $lesson->id)))
-                        && $this->lessonActivitiesSatisfied($lesson, $userId);
+                        && $this->lessonRequirementsBeforeQuizSatisfied($lesson, $quiz, $userId);
                 }
 
                 if (! $this->lessonIsServerVerified((int) $lesson->id, $userId)
@@ -1607,6 +1642,11 @@ class StudentController extends Controller
                 'message' => $submission->status === 'submitted'
                     ? 'Your assignment was submitted and is waiting for faculty review.'
                     : 'Your activity was submitted.',
+                'response_text' => $submission->response_text,
+                'file_submitted' => (bool) $submission->submission_path,
+                'file_url' => $submission->submission_path
+                    ? route('lesson-activities.download', $submission->id)
+                    : null,
                 'progress_percent' => (int) $enrollment->fresh()->progress_percent,
                 'progress_breakdown' => $this->progressService->progressBreakdown($course, (int) $student->id, $enrollment->enrolled_at),
             ]);

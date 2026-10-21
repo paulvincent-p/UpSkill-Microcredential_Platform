@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Badge;
 use App\Models\Certificate;
-use App\Models\CompetencyUnit;
 use App\Models\Complaint;
 use App\Models\Course;
 use App\Models\CourseCategory;
@@ -849,6 +848,7 @@ class FacultyController extends Controller
                 'description' => $course->description,
                 'status' => $course->statusLabel(),
                 'approval_status' => $course->approval_status,
+                'denial_feedback' => $course->denial_feedback,
                 'level' => $course->level,
                 'students_count' => Enrollment::where('course_id', $course->id)->count(),
                 'modules_count' => $modules->count(),
@@ -942,7 +942,7 @@ class FacultyController extends Controller
             'denial_feedback' => null,
         ]);
         $userNotifications->createForRole(
-            User::ROLE_ADMIN,
+            User::FULL_ADMIN_NOTIFICATION_ROLE_IDS,
             'Course awaiting review',
             '"'.$course->title.'" was submitted for administrator approval.',
             'course',
@@ -1006,7 +1006,7 @@ class FacultyController extends Controller
 
             if ($data['decision'] === 'verified' && $updatedEnrollment->academic_unit_confirmation_status === 'pending') {
                 $userNotifications->createForRole(
-                    User::ROLE_ADMIN,
+                    User::FULL_ADMIN_NOTIFICATION_ROLE_IDS,
                     'Completion awaiting confirmation',
                     'A learner completed "'.$courseTitle.'" and is awaiting institutional confirmation.',
                     'enrollment',
@@ -1040,7 +1040,6 @@ class FacultyController extends Controller
             'prereqOptions' => $this->prerequisiteOptions(),
             // #10 Badge / certificate options for the award section.
             'badgeOptions' => $this->badgeOptions(),
-            'competencyUnitOptions' => CompetencyUnit::orderBy('title')->get(['id', 'title']),
         ]);
     }
 
@@ -1064,7 +1063,6 @@ class FacultyController extends Controller
             'prereqOptions' => $this->prerequisiteOptions($course->id),
             // #10 Badge / certificate options for the award section.
             'badgeOptions' => $this->badgeOptions(),
-            'competencyUnitOptions' => CompetencyUnit::orderBy('title')->get(['id', 'title']),
         ]);
     }
 
@@ -1098,9 +1096,7 @@ class FacultyController extends Controller
             'duration' => ['nullable', 'numeric', 'min:0'],
             'passing_score' => ['nullable', 'integer', 'min:0', 'max:100'],
             'learning_objectives' => ['nullable', 'string'],
-            'learning_outcomes' => ['nullable', 'array', 'max:50'],
-            'learning_outcomes.*.description' => ['required_with:learning_outcomes', 'string', 'max:2000'],
-            'learning_outcomes.*.competency_unit_id' => ['nullable', 'integer', 'exists:competency_units,id'],
+            'learning_outcomes_content' => ['nullable', 'string', 'max:50000'],
             'competencies' => ['nullable', 'array'],
             'competencies.*' => ['string', 'max:120'],
             'prerequisites' => ['nullable', 'string', 'max:120'],
@@ -1173,12 +1169,8 @@ class FacultyController extends Controller
         $attributes['approved_by'] = null;
 
         $course->update($attributes);
-        $outcomes = $data['learning_outcomes'] ?? [];
-        if ($outcomes === []) {
-            $outcomes = collect($this->linesToArray($data['learning_objectives'] ?? null) ?? [])
-                ->map(fn (string $description): array => ['description' => $description])
-                ->all();
-        }
+        $outcomeContent = $this->sanitizeRichText($data['learning_outcomes_content'] ?? '');
+        $outcomes = $outcomeContent === '' ? [] : [['description' => $outcomeContent]];
         $learningOutcomes->sync($course, $outcomes);
 
         // Written directly rather than through update(). If 'related_skills'
@@ -1394,9 +1386,7 @@ class FacultyController extends Controller
             'duration' => ['nullable', 'numeric', 'min:0'],
             'passing_score' => ['nullable', 'integer', 'min:0', 'max:100'],
             'learning_objectives' => ['nullable', 'string'],
-            'learning_outcomes' => ['nullable', 'array', 'max:50'],
-            'learning_outcomes.*.description' => ['required_with:learning_outcomes', 'string', 'max:2000'],
-            'learning_outcomes.*.competency_unit_id' => ['nullable', 'integer', 'exists:competency_units,id'],
+            'learning_outcomes_content' => ['nullable', 'string', 'max:50000'],
             'competencies' => ['nullable', 'array'],
             'competencies.*' => ['string', 'max:120'],
             'prerequisites' => ['nullable', 'string', 'max:120'],
@@ -1423,12 +1413,8 @@ class FacultyController extends Controller
 
         try {
             $course = $courseCreationService->create($request, $data, $auth);
-            $outcomes = $data['learning_outcomes'] ?? [];
-            if ($outcomes === []) {
-                $outcomes = collect($this->linesToArray($data['learning_objectives'] ?? null) ?? [])
-                    ->map(fn (string $description): array => ['description' => $description])
-                    ->all();
-            }
+            $outcomeContent = $this->sanitizeRichText($data['learning_outcomes_content'] ?? '');
+            $outcomes = $outcomeContent === '' ? [] : [['description' => $outcomeContent]];
             $learningOutcomes->sync($course, $outcomes);
         } catch (\Throwable $e) {
             report($e);

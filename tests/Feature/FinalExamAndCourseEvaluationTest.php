@@ -212,7 +212,11 @@ test('the course review is presented as a learning step after the final exam', f
 
     expect(strpos($html, 'id="view-course-evaluation"'))->toBeGreaterThan(strpos($html, '</aside>'));
     $response->assertSee('id="course-evaluation-form"', false)
-        ->assertSee('Browse Courses')
+        ->assertSee('id="view-final-exam-result"', false)
+        ->assertSee('Congratulations! You passed the Final Exam.')
+        ->assertSee('Continue to Course Review')
+        ->assertSee('You did not pass the Final Exam.');
+    $response->assertSee('Browse Courses')
         ->assertSee('Return to My Courses')
         ->assertDontSee('Leave a course review')
         ->assertDontSee('course-evaluation-cta');
